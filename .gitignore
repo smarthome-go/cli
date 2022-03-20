@@ -19,3 +19,11 @@
 
 # Go workspace file
 go.work
+
+# Build stuff
+bin
+build
+
+# Homescript testing files
+*.hms
+.vscode/settings.json

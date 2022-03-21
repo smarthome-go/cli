@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 	"github.com/c-bata/go-prompt"
 )
 
@@ -15,11 +15,15 @@ var (
 )
 
 func StartRepl() {
-	log.Debug("Fetching switches from Smarthome")
+	if Verbose {
+		log.Println("Fetching switches from Smarthome")
+	}
 	getPersonalSwitches()
-	log.Debug("Switches have been successfully fetched")
+	if Verbose {
+		log.Println("Switches have been successfully fetched")
+	}
 
-	fmt.Printf("Welcome to Homescript.\nType exit(0) or CTRL+D to exit.\n")
+	log.Printf("Type exit(0) or CTRL+D to exit.\nWelcome to Homescript.\n")
 	p := prompt.New(
 		executor,
 		completer,

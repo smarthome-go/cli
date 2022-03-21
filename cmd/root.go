@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
+	"log"
+
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -38,11 +38,6 @@ var (
 			"  \x1b[1;34mThe Smarthome Server:\x1b[1;0m\n" +
 			"  - https://github.com/MikMuellerDev/smarthome\n",
 		Run: func(cmd *cobra.Command, args []string) {
-			if Verbose {
-				log.InitLogger(logrus.TraceLevel)
-			} else {
-				log.InitLogger(logrus.InfoLevel)
-			}
 			PromptLogin()
 			Login()
 			StartRepl()
@@ -58,11 +53,6 @@ func Execute() {
 		Long:  "Runs a homescript file and connects to the server",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			if Verbose {
-				log.InitLogger(logrus.TraceLevel)
-			} else {
-				log.InitLogger(logrus.InfoLevel)
-			}
 			PromptLogin()
 			Login()
 			homescript.RunFile(Username, args[0], SmarthomeURL, SessionCookies)
@@ -74,11 +64,6 @@ func Execute() {
 		Long:  "Prints debugging information about the server",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			if Verbose {
-				log.InitLogger(logrus.TraceLevel)
-			} else {
-				log.InitLogger(logrus.InfoLevel)
-			}
 			PromptLogin()
 			Login()
 			homescript.Run(
@@ -101,7 +86,9 @@ func Execute() {
 	*/
 	if adminPassword, adminPasswordOk := os.LookupEnv("SMARTHOME_ADMIN_PASSWORD"); adminPasswordOk && Password == "" {
 		Password = adminPassword
-		log.Debug("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
+		if Verbose {
+			log.Println("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
+		}
 	}
 	rootCmd.AddCommand(cmdRun)
 	rootCmd.AddCommand(cmdInfo)

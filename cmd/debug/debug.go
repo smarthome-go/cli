@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
+	"log"
 )
 
 type DBStatus struct {
@@ -58,25 +58,24 @@ func getDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Error(fmt.Sprintf("Failed to fetch debug info: %s", err.Error()))
+		log.Println(fmt.Sprintf("Failed to fetch debug info: %s", err.Error()))
 		return DebugInfo{}, err
 	}
 	if res.StatusCode > 299 {
-		log.Error(fmt.Sprintf("Failed to debug info: non-200 status code %s", res.Status))
+		log.Println(fmt.Sprintf("Failed to debug info: non-200 status code %s", res.Status))
 		return DebugInfo{}, err
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Error(fmt.Sprintf("Failed to fetch debug info: could not parse response: %s", res.Status))
+		log.Println(fmt.Sprintf("Failed to fetch debug info: could not parse response: %s", res.Status))
 		return DebugInfo{}, err
 	}
 	var parsedBody DebugInfo
 	if err := json.Unmarshal(body, &parsedBody); err != nil {
-		log.Error("Failed to fetch debug info: ", err.Error())
+		log.Println("Failed to fetch debug info: ", err.Error())
 		return DebugInfo{}, err
 	}
-	log.Debug("Successfully fetched debug info")
 	return parsedBody, nil
 }
 

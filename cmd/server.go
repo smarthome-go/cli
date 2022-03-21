@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
 // Used when starting a REPL session (for autocompletion)

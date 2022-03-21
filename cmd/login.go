@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
+	"log"
+
 	"github.com/howeyc/gopass"
 )
 
 // The login function prompts the user to enter his password and username (if not provided via flag)
 func PromptLogin() {
 	if Username == "" {
-		log.Info("\x1b[1;33mAuthentication required\x1b[1;0m: Enter your username below.")
+		log.Println("\x1b[1;33mAuthentication required\x1b[1;0m: Enter your username below.")
 		fmt.Printf("Username: ")
 		var username string
 		_, err := fmt.Scanln(&username)
@@ -22,10 +23,12 @@ func PromptLogin() {
 		}
 		Username = username
 	} else {
-		log.Debug("Username already set")
+		if Verbose {
+			log.Printf("Username already set")
+		}
 	}
 	if Password == "" {
-		log.Info("Please authenticate for user: ", Username)
+		log.Println("Please authenticate for user: ", Username)
 		fmt.Printf("Password: ")
 		pass, err := gopass.GetPasswd()
 		if err != nil {
@@ -33,7 +36,9 @@ func PromptLogin() {
 		}
 		Password = string(pass)
 	} else {
-		log.Debug("Password already set")
+		if Verbose {
+			log.Println("Password already set")
+		}
 	}
 }
 
@@ -67,5 +72,7 @@ func Login() {
 		log.Fatal("Failed to login: invalid cookies")
 	}
 	SessionCookies = res.Cookies()
-	log.Debug("Login successful: you are now authenticated as: ", Username)
+	if Verbose {
+		log.Println("Login successful: you are now authenticated as: ", Username)
+	}
 }

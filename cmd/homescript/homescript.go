@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
+	"log"
+
 	"github.com/MikMuellerDev/homescript/homescript"
 )
 
@@ -22,16 +23,14 @@ func Run(username string, scriptLabel string, scriptCode string, serverUrl strin
 	)
 	if err != nil && len(err) > 0 {
 		// TODO: do proper error handling
-		log.Error(fmt.Sprintf("Homescript '%s' has terminated:\n\x1b[1;0m%s", scriptLabel, err[0].Message))
-	} else {
-		log.Debug(fmt.Sprintf("Homescript '%s' ran by user '%s' was executed successfully", scriptLabel, username))
+		log.Println(fmt.Sprintf("Homescript '%s' has terminated:\n\x1b[1;0m%s", scriptLabel, err[0].Message))
 	}
 }
 
 func RunFile(username string, filename string, serverUrl string, cookies []*http.Cookie) {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Error("Failed to read file: ", err.Error())
+		log.Println("Failed to read file: ", err.Error())
 	}
 	Run(username, filename, string(content), serverUrl, cookies)
 }

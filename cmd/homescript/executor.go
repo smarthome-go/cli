@@ -9,8 +9,9 @@ import (
 	"os"
 	"time"
 
+	"log"
+
 	"github.com/MikMuellerDev/homescript-cli/cmd/debug"
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 	"github.com/MikMuellerDev/homescript/homescript/interpreter"
 )
 
@@ -37,7 +38,7 @@ func (self *Executor) Print(args ...string) {
 		output += arg
 	}
 	self.Output += output
-	log.Info(fmt.Sprintf("[Homescript] script: '%s' user: '%s': %s", self.ScriptName, self.Username, output))
+	log.Println(output)
 }
 
 func (self *Executor) SwitchOn(switchId string) (bool, error) {
@@ -50,7 +51,7 @@ func (self *Executor) Switch(switchId string, powerOn bool) error {
 		PowerOn: powerOn,
 	})
 	if err != nil {
-		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, err.Error()))
+		log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, err.Error()))
 		return err
 	}
 	req, err := http.NewRequest(
@@ -72,19 +73,14 @@ func (self *Executor) Switch(switchId string, powerOn bool) error {
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, err.Error()))
+		log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, err.Error()))
 		return err
 	}
 	if res.StatusCode > 299 {
-		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, res.Status))
+		log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, res.Status))
 		return err
 	}
 	defer res.Body.Close()
-	onOffText := "on"
-	if !powerOn {
-		onOffText = "off"
-	}
-	log.Debug(fmt.Sprintf("[Homescript] script: '%s' user: '%s': turning switch %s %s", self.ScriptName, self.Username, switchId, onOffText))
 	return nil
 }
 
@@ -107,19 +103,19 @@ func (self *Executor) Log(
 ) error {
 	switch level {
 	case 0:
-		log.Trace(title, description)
+		log.Println(title, description)
 	case 1:
-		log.Debug(title, description)
+		log.Println(title, description)
 	case 2:
-		log.Info(title, description)
+		log.Println(title, description)
 	case 3:
-		log.Warn(title, description)
+		log.Println(title, description)
 	case 4:
-		log.Error(title, description)
+		log.Println(title, description)
 	case 5:
-		log.Fatal(title, description)
+		log.Println(title, description)
 	default:
-		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to log event: invalid level", self.ScriptName, self.Username))
+		log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to log event: invalid level", self.ScriptName, self.Username))
 	}
 	return nil
 }
@@ -129,12 +125,12 @@ func (self *Executor) GetUser() string {
 }
 
 func (self *Executor) GetWeather() (string, error) {
-	log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': weather is not implemented yet", self.ScriptName, self.Username))
+	log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': weather is not implemented yet", self.ScriptName, self.Username))
 	return "rainy", nil
 }
 
 func (self *Executor) GetTemperature() (int, error) {
-	log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': temperature is not implemented yet", self.ScriptName, self.Username))
+	log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': temperature is not implemented yet", self.ScriptName, self.Username))
 	return 42, nil
 }
 
@@ -146,7 +142,7 @@ func (self *Executor) GetDate() (int, int, int, int, int, int) {
 func (self *Executor) GetDebugInfo() (string, error) {
 	debugInfo, err := debug.GetServerInfo(self.ServerUrl, self.SessionCookies)
 	if err != nil {
-		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': could not get debug info: %s", self.ScriptName, self.Username, err.Error()))
+		log.Println(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': could not get debug info: %s", self.ScriptName, self.Username, err.Error()))
 		return "", err
 	}
 	return "\n" + debugInfo, nil

@@ -32,9 +32,9 @@ func StartRepl() {
 		prompt.OptionHistory(History),
 		prompt.OptionSuggestionBGColor(prompt.DarkGray),
 		prompt.OptionSelectedSuggestionBGColor(prompt.Blue),
+		prompt.OptionCompletionOnDown(),
 	)
 	p.Run()
-	fmt.Print("\x1b[3J\033c")
 }
 
 func executor(input string) {
@@ -66,5 +66,6 @@ func completer(d prompt.Document) []prompt.Suggest {
 		suggestions = append(suggestions, prompt.Suggest{Text: "exit(0)", Description: "Exit the repl"})
 	}
 
-	return prompt.FilterHasPrefix(suggestions, d.GetWordBeforeCursor(), true)
+	// return prompt.FilterHasPrefix(suggestions, d.GetWordBeforeCursor(), true)
+	return prompt.FilterContains(suggestions, d.GetWordBeforeCursor(), true)
 }

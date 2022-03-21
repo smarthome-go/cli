@@ -30,6 +30,7 @@ func StartRepl() {
 		prompt.OptionSelectedSuggestionBGColor(prompt.Blue),
 	)
 	p.Run()
+	fmt.Print("\x1b[3J\033c")
 }
 
 func executor(input string) {

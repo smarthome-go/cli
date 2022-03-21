@@ -17,12 +17,12 @@ func Run(username string, scriptLabel string, scriptCode string, serverUrl strin
 		ServerUrl:      serverUrl,
 		SessionCookies: cookies,
 	}
-
-	err := homescript.Run(
-		executor, scriptCode,
+	_, err := homescript.Run(
+		executor, scriptLabel, scriptCode,
 	)
 	if err != nil && len(err) > 0 {
-		log.Error(fmt.Sprintf("Homescript '%s' has terminated:\n\x1b[1;0m%s", scriptLabel, err[0].Error()))
+		// TODO: do proper error handling
+		log.Error(fmt.Sprintf("Homescript '%s' has terminated:\n\x1b[1;0m%s", scriptLabel, err[0].Message))
 	} else {
 		log.Debug(fmt.Sprintf("Homescript '%s' ran by user '%s' was executed successfully", scriptLabel, username))
 	}

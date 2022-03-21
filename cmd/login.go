@@ -68,5 +68,4 @@ func Login() {
 	}
 	SessionCookies = res.Cookies()
 	log.Debug("Login successful: you are now authenticated as: ", Username)
-	fmt.Print("\x1b[3J")
 }

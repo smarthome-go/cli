@@ -45,8 +45,8 @@ var (
 			}
 			PromptLogin()
 			Login()
-			DisplayServerInfo()
 			StartRepl()
+			fmt.Print("\x1b[3J\033c")
 		},
 	}
 )
@@ -65,12 +65,33 @@ func Execute() {
 			}
 			PromptLogin()
 			Login()
-			DisplayServerInfo()
 			homescript.RunFile(Username, args[0], SmarthomeURL, SessionCookies)
 		},
 	}
+	cmdInfo := &cobra.Command{
+		Use:   "info",
+		Short: "Server Debug Info",
+		Long:  "Prints debugging information about the server",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			if Verbose {
+				log.InitLogger(logrus.TraceLevel)
+			} else {
+				log.InitLogger(logrus.InfoLevel)
+			}
+			PromptLogin()
+			Login()
+			homescript.Run(
+				Username,
+				"info:01",
+				`print(debugInfo)`,
+				SmarthomeURL,
+				SessionCookies,
+			)
+		},
+	}
+
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
-	rootCmd.PersistentFlags().BoolVarP(&ShowInfo, "info", "i", false, "show server info")
 	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "smarthome user used for connection")
 	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "smarthome password used for connection")
 	rootCmd.PersistentFlags().StringVarP(&SmarthomeURL, "smarthome-url", "s", "http://localhost", "Url used for connecting to smarthome")
@@ -83,6 +104,7 @@ func Execute() {
 		log.Debug("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
 	}
 	rootCmd.AddCommand(cmdRun)
+	rootCmd.AddCommand(cmdInfo)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

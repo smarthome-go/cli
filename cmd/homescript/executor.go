@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/MikMuellerDev/homescript-cli/cmd/debug"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 	"github.com/MikMuellerDev/homescript/homescript/interpreter"
 )
@@ -140,4 +141,13 @@ func (self *Executor) GetTemperature() (int, error) {
 func (self *Executor) GetDate() (int, int, int, int, int, int) {
 	now := time.Now()
 	return now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute(), now.Second()
+}
+
+func (self *Executor) GetDebugInfo() (string, error) {
+	debugInfo, err := debug.GetServerInfo(self.ServerUrl, self.SessionCookies)
+	if err != nil {
+		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': could not get debug info: %s", self.ScriptName, self.Username, err.Error()))
+		return "", err
+	}
+	return "\n" + debugInfo, nil
 }

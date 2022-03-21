@@ -5,7 +5,7 @@ go 1.18
 require github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 
 require (
-	github.com/MikMuellerDev/homescript v0.2.1-beta // indirect
+	github.com/MikMuellerDev/homescript v0.2.2-beta // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect

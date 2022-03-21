@@ -50,6 +50,7 @@ func (self *Executor) Switch(switchId string, powerOn bool) error {
 	})
 	if err != nil {
 		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, err.Error()))
+		return err
 	}
 	req, err := http.NewRequest(
 		"POST",
@@ -65,12 +66,17 @@ func (self *Executor) Switch(switchId string, powerOn bool) error {
 			},
 		)
 	}
+	if err != nil {
+		return err
+	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, err.Error()))
+		return err
 	}
 	if res.StatusCode > 299 {
 		log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': failed to set power: %s", self.ScriptName, self.Username, res.Status))
+		return err
 	}
 	defer res.Body.Close()
 	onOffText := "on"

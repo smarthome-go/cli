@@ -57,6 +57,7 @@ func completer(d prompt.Document) []prompt.Suggest {
 		}
 	} else {
 		suggestions = append(suggestions, prompt.Suggest{Text: "switch(", Description: "Turn on / off a switch"})
+		suggestions = append(suggestions, prompt.Suggest{Text: "print(debugInfo)", Description: "Print debug information"})
 		suggestions = append(suggestions, prompt.Suggest{Text: "print('')", Description: "Print something to the console"})
 		suggestions = append(suggestions, prompt.Suggest{Text: "exit(0)", Description: "Exit the repl"})
 	}

@@ -67,5 +67,6 @@ func Login() {
 		log.Fatal("Failed to login: invalid cookies")
 	}
 	SessionCookies = res.Cookies()
-	log.Info("Login successful: you are now authenticated as: ", Username)
+	log.Debug("Login successful: you are now authenticated as: ", Username)
+	fmt.Print("\x1b[3J")
 }

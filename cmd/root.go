@@ -73,7 +73,7 @@ func Execute() {
 	rootCmd.PersistentFlags().BoolVarP(&ShowInfo, "info", "i", false, "show server info")
 	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "smarthome user used for connection")
 	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "smarthome password used for connection")
-	rootCmd.PersistentFlags().StringVarP(&SmarthomeURL, "smarthome-url", "s", "http://localhost:8082", "Url used for connecting to smarthome")
+	rootCmd.PersistentFlags().StringVarP(&SmarthomeURL, "smarthome-url", "s", "http://localhost", "Url used for connecting to smarthome")
 	// Environment variables, same as the ones used in the docker image
 	/*
 		`SMARTHOME_ADMIN_PASSWORD`: Checks for the smarthome admin user

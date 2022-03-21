@@ -30,7 +30,7 @@ func StartRepl() {
 		prompt.OptionPrefix("homescript> "),
 		prompt.OptionTitle("Homescript"),
 		prompt.OptionHistory(History),
-		prompt.OptionSuggestionBGColor(prompt.DarkGray),
+		prompt.OptionSuggestionBGColor(prompt.Black),
 		prompt.OptionSelectedSuggestionBGColor(prompt.Blue),
 		prompt.OptionCompletionOnDown(),
 	)

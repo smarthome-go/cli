@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
@@ -26,7 +27,7 @@ type PowerRequest struct {
 }
 
 func (self *Executor) Exit(code int) {
-	// TODO: implement an actual quit
+	os.Exit(code)
 }
 
 func (self *Executor) Print(args ...string) {
@@ -43,7 +44,6 @@ func (self *Executor) SwitchOn(switchId string) (bool, error) {
 }
 
 func (self *Executor) Switch(switchId string, powerOn bool) error {
-
 	body, err := json.Marshal(PowerRequest{
 		Switch:  switchId,
 		PowerOn: powerOn,

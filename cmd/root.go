@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	Verbose bool
+	Verbose  bool
+	ShowInfo bool
 
 	SmarthomeURL   string
 	SessionCookies []*http.Cookie
@@ -36,27 +37,40 @@ var (
 			"  - https://github.com/MikMuellerDev/homescript-cli\n\n" +
 			"  \x1b[1;34mThe Smarthome Server:\x1b[1;0m\n" +
 			"  - https://github.com/MikMuellerDev/smarthome\n",
+		Run: func(cmd *cobra.Command, args []string) {
+			if Verbose {
+				log.InitLogger(logrus.TraceLevel)
+			} else {
+				log.InitLogger(logrus.InfoLevel)
+			}
+			PromptLogin()
+			Login()
+			DisplayServerInfo()
+			StartRepl()
+		},
 	}
 )
 
 func Execute() {
-	if Verbose {
-		log.InitLogger(logrus.TraceLevel)
-	} else {
-		log.InitLogger(logrus.InfoLevel)
-	}
 	cmdRun := &cobra.Command{
 		Use:   "run [filename]",
 		Short: "Run a homescript file",
 		Long:  "Runs a homescript file and connects to the server",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			if Verbose {
+				log.InitLogger(logrus.TraceLevel)
+			} else {
+				log.InitLogger(logrus.InfoLevel)
+			}
 			PromptLogin()
 			Login()
+			DisplayServerInfo()
 			homescript.RunFile(Username, args[0], SmarthomeURL, SessionCookies)
 		},
 	}
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().BoolVarP(&ShowInfo, "info", "i", false, "show server info")
 	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "smarthome user used for connection")
 	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "smarthome password used for connection")
 	rootCmd.PersistentFlags().StringVarP(&SmarthomeURL, "smarthome-url", "s", "http://localhost:8082", "Url used for connecting to smarthome")

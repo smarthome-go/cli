@@ -22,16 +22,16 @@ func Run(username string, scriptLabel string, scriptCode string, serverUrl strin
 		executor, scriptCode,
 	)
 	if err != nil && len(err) > 0 {
-		log.Fatal(fmt.Sprintf("Homescript '%s' ran by user '%s' has terminated:\n%s", scriptLabel, username, err[0].Error()))
-		fmt.Printf("Output:\n%s\n", executor.Output)
+		log.Error(fmt.Sprintf("Homescript '%s' has terminated:\n\x1b[1;0m%s", scriptLabel, err[0].Error()))
+	} else {
+		log.Debug(fmt.Sprintf("Homescript '%s' ran by user '%s' was executed successfully", scriptLabel, username))
 	}
-	log.Info(fmt.Sprintf("Homescript '%s' ran by user '%s' was executed successfully", scriptLabel, username))
 }
 
 func RunFile(username string, filename string, serverUrl string, cookies []*http.Cookie) {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatal("Failed to read file: ", err.Error())
+		log.Error("Failed to read file: ", err.Error())
 	}
 	Run(username, filename, string(content), serverUrl, cookies)
 }

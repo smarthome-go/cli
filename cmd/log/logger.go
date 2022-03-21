@@ -48,11 +48,10 @@ func Warn(args ...string) {
 }
 
 func Error(args ...string) {
-	output := "\x1b[1;31m"
+	var output string
 	for _, arg := range args {
 		output += arg
 	}
-	output += "\x1b[1;0m"
 	log.Error(output)
 }
 

@@ -5,7 +5,7 @@ go 1.18
 require github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 
 require (
-	github.com/MikMuellerDev/homescript v0.2.0-beta // indirect
+	github.com/MikMuellerDev/homescript v0.2.1-beta // indirect
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
 )

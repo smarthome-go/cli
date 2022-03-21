@@ -17,6 +17,7 @@ type Executor struct {
 	Username       string
 	ServerUrl      string
 	SessionCookies []*http.Cookie
+	Output         string
 }
 
 type PowerRequest struct {
@@ -24,23 +25,24 @@ type PowerRequest struct {
 	PowerOn bool   `json:"powerOn"`
 }
 
-func (self Executor) Exit(code int) {
+func (self *Executor) Exit(code int) {
 	// TODO: implement an actual quit
 }
 
-func (self Executor) Print(args ...string) {
+func (self *Executor) Print(args ...string) {
 	var output string
 	for _, arg := range args {
 		output += arg
 	}
+	self.Output += output
 	log.Info(fmt.Sprintf("[Homescript] script: '%s' user: '%s': %s", self.ScriptName, self.Username, output))
 }
 
-func (self Executor) SwitchOn(switchId string) (bool, error) {
+func (self *Executor) SwitchOn(switchId string) (bool, error) {
 	return false, nil
 }
 
-func (self Executor) Switch(switchId string, powerOn bool) error {
+func (self *Executor) Switch(switchId string, powerOn bool) error {
 
 	body, err := json.Marshal(PowerRequest{
 		Switch:  switchId,
@@ -79,11 +81,11 @@ func (self Executor) Switch(switchId string, powerOn bool) error {
 	return nil
 }
 
-func (self Executor) Play(server string, mode string) error {
+func (self *Executor) Play(server string, mode string) error {
 	return errors.New("The feature 'radiGo' is not yet implemented")
 }
 
-func (self Executor) Notify(
+func (self *Executor) Notify(
 	title string,
 	description string,
 	level interpreter.LogLevel,
@@ -91,7 +93,7 @@ func (self Executor) Notify(
 	return nil
 }
 
-func (self Executor) Log(
+func (self *Executor) Log(
 	title string,
 	description string,
 	level interpreter.LogLevel,
@@ -115,21 +117,21 @@ func (self Executor) Log(
 	return nil
 }
 
-func (self Executor) GetUser() string {
+func (self *Executor) GetUser() string {
 	return self.Username
 }
 
-func (self Executor) GetWeather() (string, error) {
+func (self *Executor) GetWeather() (string, error) {
 	log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': weather is not implemented yet", self.ScriptName, self.Username))
 	return "rainy", nil
 }
 
-func (self Executor) GetTemperature() (int, error) {
+func (self *Executor) GetTemperature() (int, error) {
 	log.Error(fmt.Sprintf("[Homescript] ERROR: script: '%s' user: '%s': temperature is not implemented yet", self.ScriptName, self.Username))
 	return 42, nil
 }
 
-func (self Executor) GetDate() (int, int, int, int, int, int) {
+func (self *Executor) GetDate() (int, int, int, int, int, int) {
 	now := time.Now()
 	return now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute(), now.Second()
 }

@@ -1,5 +1,7 @@
 github.com/MikMuellerDev/homescript v0.2.0-beta h1:KE89iVE4gRHT9JNAfslH3RrsA9s+KRgkd5VOlKqDEgM=
 github.com/MikMuellerDev/homescript v0.2.0-beta/go.mod h1:G//I3KBaq2q+fz7mQvHoBg9ZLMPI+APuJd6HBlxv848=
+github.com/MikMuellerDev/homescript v0.2.1-beta h1:0st/OQhHP0ivnAovG5l0vK5fpAKnDWkcPDn01jAoxbU=
+github.com/MikMuellerDev/homescript v0.2.1-beta/go.mod h1:G//I3KBaq2q+fz7mQvHoBg9ZLMPI+APuJd6HBlxv848=
 github.com/cpuguy83/go-md2man/v2 v2.0.1/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef h1:A9HsByNhogrvm9cWb28sjiS3i7tcKCkflWFEkHfuAgM=

@@ -19,7 +19,7 @@ type Switch struct {
 func getPersonalSwitches() {
 	req, err := http.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/api/power/list/personal", SmarthomeURL),
+		fmt.Sprintf("%s/api/switch/list/personal", SmarthomeURL),
 		nil,
 	)
 	for _, cookie := range SessionCookies {

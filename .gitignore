@@ -27,3 +27,4 @@ build
 # Homescript testing files
 *.hms
 .vscode/settings.json
+homescript_linux_386.tar.gz

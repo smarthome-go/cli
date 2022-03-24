@@ -120,6 +120,10 @@ func (self *Executor) Log(
 	return nil
 }
 
+func (self *Executor) Exec(input string) (string, error) {
+	return "", fmt.Errorf("Exec is not implemented in homescript-cli")
+}
+
 func (self *Executor) GetUser() string {
 	return self.Username
 }

@@ -11,20 +11,21 @@ import (
 )
 
 // Executes a given homescript as a given user, returns the output and a possible error
-func Run(username string, scriptLabel string, scriptCode string, serverUrl string, cookies []*http.Cookie) {
+func Run(username string, scriptLabel string, scriptCode string, serverUrl string, cookies []*http.Cookie) int {
 	executor := &Executor{
 		Username:       username,
 		ScriptName:     scriptLabel,
 		ServerUrl:      serverUrl,
 		SessionCookies: cookies,
 	}
-	_, err := homescript.Run(
+	exitCode, err := homescript.Run(
 		executor, scriptLabel, scriptCode,
 	)
 	if err != nil && len(err) > 0 {
 		// TODO: do proper error handling
 		log.Println(fmt.Sprintf("Homescript '%s' has terminated:\n\x1b[1;0m%s", scriptLabel, err[0].Message))
 	}
+	return exitCode
 }
 
 func RunFile(username string, filename string, serverUrl string, cookies []*http.Cookie) {

@@ -42,7 +42,7 @@ type DebugInfo struct {
 }
 
 // Fetches debug information from the smarthome server
-func getDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
+func GetDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
 	req, err := http.NewRequest(
 		"GET",
 		fmt.Sprintf("%s/api/debug", url),
@@ -80,7 +80,7 @@ func getDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
 }
 
 func GetServerInfo(url string, cookies []*http.Cookie) (string, error) {
-	debugInfo, err := getDebugInfo(url, cookies)
+	debugInfo, err := GetDebugInfo(url, cookies)
 	if err != nil {
 		return "", err
 	}

@@ -2,8 +2,8 @@ appname := homescript
 workingdir := "homescript-cli"
 sources := $(wildcard *.go)
 
-build = GOOS=$(1) GOARCH=$(2) go build -o ./bin/$(appname)$(3) $(4)
-tar = mkdir -p build && tar -cvzf ./$(appname)_$(1)_$(2).tar.gz bin && mv $(appname)_$(1)_$(2).tar.gz build
+build = GOOS=$(1) GOARCH=$(2) go build -o $(appname)$(3) $(4)
+tar = mkdir -p build && tar -cvzf ./$(appname)_$(1)_$(2).tar.gz $(appname)$(3) && mv $(appname)_$(1)_$(2).tar.gz build
 
 # Clean
 clean:

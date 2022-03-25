@@ -1,7 +1,3 @@
-github.com/MikMuellerDev/homescript v0.2.2-beta h1:9wE23NOCniLtL22npfoEJCU2U0TgbWFBQGAGvPkY2Ks=
-github.com/MikMuellerDev/homescript v0.2.2-beta/go.mod h1:G//I3KBaq2q+fz7mQvHoBg9ZLMPI+APuJd6HBlxv848=
-github.com/MikMuellerDev/homescript v0.2.3-beta h1:GQWqoAZcDMJsPxRIXURNic+xytNlCMAiuMGL+rTUQFU=
-github.com/MikMuellerDev/homescript v0.2.3-beta/go.mod h1:G//I3KBaq2q+fz7mQvHoBg9ZLMPI+APuJd6HBlxv848=
 github.com/chzyer/logex v1.2.0 h1:+eqR0HfOetur4tgnC8ftU5imRnhi4te+BadWS95c5AM=
 github.com/chzyer/logex v1.2.0/go.mod h1:9+9sk7u7pGNWYMkh0hdiL++6OeibzJccyQU4p4MedaY=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e h1:fY5BOSpyZCqRo5OhCuC+XN+r/bBCmeuuJtjz+bCNIf8=

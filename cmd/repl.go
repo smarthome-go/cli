@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"time"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/debug"
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
@@ -16,62 +17,6 @@ var (
 	Switches  []Switch
 	DebugInfo debug.DebugInfo
 )
-
-// func StartRepl() {
-// 	if Verbose {
-// 		log.Println("Fetching switches from Smarthome")
-// 	}
-// 	getPersonalSwitches()
-// 	if Verbose {
-// 		log.Println("Switches have been successfully fetched")
-// 	}
-
-// 	log.Printf("Type exit(0) or CTRL+D to exit.\nWelcome to Homescript.\n")
-// 	p := prompt.New(
-// 		executor,
-// 		completer,
-// 		prompt.OptionPrefix("homescript> "),
-// 		prompt.OptionTitle("Homescript"),
-// 		prompt.OptionHistory(History),
-// 		prompt.OptionSuggestionBGColor(prompt.Black),
-// 		prompt.OptionSelectedSuggestionBGColor(prompt.Blue),
-// 		prompt.OptionCompletionOnDown(),
-// 	)
-// 	p.Run()
-// }
-
-// func executor(input string) {
-// 	homescript.Run(Username, "repl:01", input, SmarthomeURL, SessionCookies)
-// }
-
-// func completer(d prompt.Document) []prompt.Suggest {
-// 	var suggestions []prompt.Suggest
-// 	if strings.Contains(d.CurrentLineBeforeCursor(), "switch(") {
-// 		for _, switchItem := range Switches {
-// 			if strings.Contains(d.CurrentLineBeforeCursor(), "switch(") && !strings.Contains(d.CurrentLineBeforeCursor(), ",") {
-// 				suggestions = append(suggestions, prompt.Suggest{
-// 					Text:        fmt.Sprintf("'%s', ", switchItem.Id),
-// 					Description: fmt.Sprintf("% 4s | %s", switchItem.Id, switchItem.Name),
-// 				})
-// 			}
-// 		}
-
-// 		for _, switchItem := range Switches {
-// 			if strings.Contains(d.CurrentLineBeforeCursor(), "switch(") && strings.Contains(d.CurrentLineBeforeCursor(), switchItem.Id) {
-// 				suggestions = append(suggestions, prompt.Suggest{Text: "on)", Description: "ON keyword"})
-// 				suggestions = append(suggestions, prompt.Suggest{Text: "off)", Description: "OFF keyword"})
-// 			}
-// 		}
-// 	} else {
-// 		suggestions = append(suggestions, prompt.Suggest{Text: "switch(", Description: "Turn on / off a switch"})
-// 		suggestions = append(suggestions, prompt.Suggest{Text: "print(debugInfo)", Description: "Print debug information"})
-// 		suggestions = append(suggestions, prompt.Suggest{Text: "print('')", Description: "Print something to the console"})
-// 		suggestions = append(suggestions, prompt.Suggest{Text: "exit(0)", Description: "Exit the repl"})
-// 	}
-
-// 	// return prompt.FilterHasPrefix(suggestions, d.GetWordBeforeCursor(), true)
-// 	return prompt.FilterContains(suggestions, d.GetWordBeforeCursor(), true)
-// }
 
 func usage(w io.Writer) {
 	io.WriteString(w, "commands:\n")
@@ -111,7 +56,6 @@ func filterInput(r rune) (rune, bool) {
 	return r, true
 }
 
-// TODO: only execute script locally when special flag is provided
 func StartRepl() {
 	if Verbose {
 		log.Println("Fetching switches from Smarthome")
@@ -155,11 +99,12 @@ func StartRepl() {
 			break
 		}
 
-		exitCode := homescript.Run(Username, "repl:01", line, SmarthomeURL, SessionCookies)
+		startTime := time.Now()
+		exitCode := homescript.Run(line, SmarthomeURL, SessionCookies)
 		var display string
 		if exitCode != 0 {
 			display = fmt.Sprintf(" \x1b[31m[%d]\x1b[0m", exitCode)
 		}
-		l.SetPrompt(fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m%s> ", Username, display))
+		l.SetPrompt(fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m%s[\x1b[90m%.2fs\x1b[0m]> ", Username, display, time.Since(startTime).Seconds()))
 	}
 }

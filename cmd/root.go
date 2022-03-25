@@ -55,7 +55,7 @@ func Execute() {
 		Run: func(cmd *cobra.Command, args []string) {
 			PromptLogin()
 			Login()
-			homescript.RunFile(Username, args[0], SmarthomeURL, SessionCookies)
+			homescript.RunFile(args[0], SmarthomeURL, SessionCookies)
 		},
 	}
 	cmdInfo := &cobra.Command{
@@ -67,8 +67,6 @@ func Execute() {
 			PromptLogin()
 			Login()
 			homescript.Run(
-				Username,
-				"info:01",
 				`print(debugInfo)`,
 				SmarthomeURL,
 				SessionCookies,

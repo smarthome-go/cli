@@ -28,3 +28,5 @@ build
 *.hms
 .vscode/settings.json
 homescript_linux_386.tar.gz
+.vscode/dryrun.log
+.vscode/targets.log

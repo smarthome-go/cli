@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
 // Used when starting a REPL session (for autocompletion)
@@ -13,6 +15,7 @@ type Switch struct {
 	Id     string `json:"id"`
 	Name   string `json:"name"`
 	RoomId string `json:"roomId"`
+	Watts  uint   `json:"watts"`
 }
 
 // Fetches the available user switches from the smarthome server
@@ -23,7 +26,7 @@ func getPersonalSwitches() {
 		nil,
 	)
 	if err != nil {
-		loge("Failed to fetch switches: could not create request: ", err.Error())
+		log.Loge("Failed to fetch switches: could not create request: ", err.Error())
 		os.Exit(1)
 	}
 	for _, cookie := range SessionCookies {
@@ -36,38 +39,38 @@ func getPersonalSwitches() {
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		loge(fmt.Sprintf("Failed to fetch switches: %s", err.Error()))
+		log.Loge(fmt.Sprintf("Failed to fetch switches: %s", err.Error()))
 		os.Exit(1)
 	}
 
 	switch res.StatusCode {
 	case 200:
 	case 400:
-		loge("Failed to fetch switches (\x1b[33m400\x1b[0m): invalid request body. Is your homescript client up-to-date?")
+		log.Loge("Failed to fetch switches (\x1b[33m400\x1b[0m): invalid request body. Is your homescript client up-to-date?")
 		os.Exit(2)
 	case 401:
-		loge("Failed to fetch switches (\x1b[33m401\x1b[0m): invalid credentials")
+		log.Loge("Failed to fetch switches (\x1b[33m401\x1b[0m): invalid credentials")
 		os.Exit(3)
 	case 500:
-		loge("Failed to fetch switches (\x1b[31m500\x1b[0m): smarthome server returned an error")
+		log.Loge("Failed to fetch switches (\x1b[31m500\x1b[0m): smarthome server returned an error")
 		os.Exit(4)
 	case 503:
-		loge("Failed to fetch switches (\x1b[31m503\x1b[0m): smarthome is currently unavailable. Is the datbase online?")
+		log.Loge("Failed to fetch switches (\x1b[31m503\x1b[0m): smarthome is currently unavailable. Is the datbase online?")
 		os.Exit(5)
 	default:
-		loge("Failed to fetch switches: received unknown status code from smarthome: ", res.Status)
+		log.Loge("Failed to fetch switches: received unknown status code from smarthome: ", res.Status)
 		os.Exit(6)
 	}
 
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		loge(fmt.Sprintf("Failed to fetch switches: could not parse response: %s", res.Status))
+		log.Loge(fmt.Sprintf("Failed to fetch switches: could not parse response: %s", res.Status))
 		os.Exit(1)
 	}
 	var parsedBody []Switch
 	if err := json.Unmarshal(body, &parsedBody); err != nil {
-		loge("Failed to fetch switches: ", err.Error())
+		log.Loge("Failed to fetch switches: ", err.Error())
 		os.Exit(1)
 	}
 	Switches = parsedBody

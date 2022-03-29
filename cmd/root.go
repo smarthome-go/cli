@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
+	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 	"github.com/spf13/cobra"
 )
 
-const Version = "0.3.1-beta"
+const Version = "0.4.0-beta"
 
 var (
 	Verbose  bool
@@ -41,7 +42,8 @@ var (
 			"  \x1b[1;34mThe Smarthome Server:\x1b[1;0m\n" +
 			"  - https://github.com/MikMuellerDev/smarthome\n",
 		Run: func(cmd *cobra.Command, args []string) {
-			initLog(Verbose)
+			log.InitLog(Verbose)
+			PingServer()
 			PromptLogin()
 			Login(true)
 			StartRepl()
@@ -57,7 +59,8 @@ func Execute() {
 		Long:  "Runs a homescript file and connects to the server",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			initLog(Verbose)
+			log.InitLog(Verbose)
+			PingServer()
 			PromptLogin()
 			Login(true)
 			homescript.RunFile(args[0], SmarthomeURL, SessionCookies)
@@ -69,7 +72,8 @@ func Execute() {
 		Long:  "Prints debugging information about the server",
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			initLog(Verbose)
+			log.InitLog(Verbose)
+			PingServer()
 			PromptLogin()
 			Login(true)
 			homescript.Run(
@@ -85,7 +89,8 @@ func Execute() {
 		Long:  "Run code via Stdin without interactive prompts and output. Ideal for bash-based scripting.",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			initLog(Verbose)
+			log.InitLog(Verbose)
+			PingServer()
 			Login(false)
 			homescript.Run(
 				`print(debugInfo)`,
@@ -94,12 +99,25 @@ func Execute() {
 			)
 		},
 	}
+	cmdListSwitches := &cobra.Command{
+		Use:   "switches",
+		Short: "List switches",
+		Long:  "List switches of the current user",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			log.InitLog(Verbose)
+			PingServer()
+			Login(true)
+			getPersonalSwitches()
+			listSwitches()
+		},
+	}
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
 	rootCmd.PersistentFlags().BoolVarP(&Silent, "silent", "s", false, "no output")
 	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "smarthome user used for connection")
 	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "smarthome password used for connection")
 	rootCmd.PersistentFlags().StringVarP(&SmarthomeURL, "ip", "i", "http://localhost", "Url used for connecting to smarthome")
-	initLog(true)
+	log.InitLog(true)
 	// Environment variables, same as the ones used in the docker image
 	/*
 		`SMARTHOME_ADMIN_PASSWORD`: Checks for the smarthome admin user
@@ -107,12 +125,13 @@ func Execute() {
 	if adminPassword, adminPasswordOk := os.LookupEnv("SMARTHOME_ADMIN_PASSWORD"); adminPasswordOk && Password == "" {
 		Password = adminPassword
 		if Verbose {
-			logn("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
+			log.Logn("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
 		}
 	}
 	rootCmd.AddCommand(cmdRun)
 	rootCmd.AddCommand(cmdInfo)
 	rootCmd.AddCommand(cmdPipeIn)
+	rootCmd.AddCommand(cmdListSwitches)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)

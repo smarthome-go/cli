@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"log"
+	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
 type RunRequest struct {
@@ -52,7 +52,7 @@ func startSpinner(text string, ch *chan bool) {
 	startTime := time.Now()
 	for {
 		for _, pos := range positions {
-			if time.Since(startTime).Milliseconds() > 300 {
+			if time.Since(startTime).Milliseconds() > 200 {
 				fmt.Printf("%s %s [%.1fs]\x1b[1F", pos, text, time.Since(startTime).Seconds())
 				time.Sleep(time.Millisecond * 50)
 				fmt.Println()
@@ -104,7 +104,7 @@ func Run(scriptCode string, serverUrl string, cookies []*http.Cookie) int {
 	})
 	if err != nil {
 		ch <- true
-		log.Printf("%sError%s: Could not encode request to JSON: %s\n", ANSIRedFg, ANSIClearFg, err.Error())
+		log.Logn(fmt.Sprintf("%sError%s: Could not encode request to JSON: %s", ANSIRedFg, ANSIClearFg, err.Error()))
 		return 2
 	}
 	req, err := http.NewRequest(
@@ -114,7 +114,7 @@ func Run(scriptCode string, serverUrl string, cookies []*http.Cookie) int {
 	)
 	if err != nil {
 		ch <- true
-		log.Printf("%sError%s: Failed to create request from parameters: %s\n", ANSIRedFg, ANSIClearFg, err.Error())
+		log.Logn(fmt.Sprintf("%sError%s: Failed to create request from parameters: %s", ANSIRedFg, ANSIClearFg, err.Error()))
 		return 10
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -132,48 +132,48 @@ func Run(scriptCode string, serverUrl string, cookies []*http.Cookie) int {
 	res, err := client.Do(req)
 	if err != nil {
 		ch <- true
-		log.Printf("%sError%s: Failed to send request to server: %s\n", ANSIRedFg, ANSIClearFg, err.Error())
+		log.Logn(fmt.Sprintf("%sError%s: Failed to send request to server: %s", ANSIRedFg, ANSIClearFg, err.Error()))
 		return 11
 	}
 	ch <- true
 	defer res.Body.Close()
 	switch res.StatusCode {
 	case 401:
-		log.Printf("Failed to run Homescript: unauthorized\n")
+		log.Logn("Failed to run Homescript: unauthorized")
 		return 401
 	case 200:
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Printf("%sError%s: Failed to display output: could not evaluate server's response: %s\n", ANSIRedFg, ANSIClearFg, err.Error())
+			log.Logn(fmt.Sprintf("%sError%s: Failed to display output: could not evaluate server's response: %s", ANSIRedFg, ANSIClearFg, err.Error()))
 			return 12
 		}
 		var parsedBody HomescriptResponse
 		if err := json.Unmarshal(body, &parsedBody); err != nil {
-			log.Printf("%sError%s: Failed to parse server's response: %s. body:'%s'\n", ANSIRedFg, ANSIClearFg, err.Error(), body)
+			log.Logn(fmt.Sprintf("%sError%s: Failed to parse server's response: %s. body:'%s'", ANSIRedFg, ANSIClearFg, err.Error(), body))
 			return 13
 		}
 		if parsedBody.Output != "" {
-			log.Printf("Output: %s\n", parsedBody.Output)
+			log.Logn(parsedBody.Output)
 		}
 		return parsedBody.Exitcode
 	case 500:
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Printf("%sError%s: Failed to display error: could not evaluate server's response: %s\n", ANSIRedFg, ANSIClearFg, err.Error())
+			log.Logn(fmt.Sprintf("%sError%s: Failed to display error: could not evaluate server's response: %s", ANSIRedFg, ANSIClearFg, err.Error()))
 			return 12
 		}
 		var parsedBody HomescriptResponse
 		if err := json.Unmarshal(body, &parsedBody); err != nil {
-			log.Printf("%sError%s: Failed to parse server's response: %s. body:'%s'\n", ANSIRedFg, ANSIClearFg, err.Error(), body)
+			log.Logn(fmt.Sprintf("%sError%s: Failed to parse server's response: %s. body:'%s'", ANSIRedFg, ANSIClearFg, err.Error(), body))
 			return 13
 		}
-		log.Printf("Homescript error: terminated with exit code: %d\n", parsedBody.Exitcode)
+		log.Logn(fmt.Sprintf("Homescript error: terminated with exit code: %d", parsedBody.Exitcode))
 		for _, errorItem := range parsedBody.Errors {
 			printError(errorItem, scriptCode)
 		}
 		return parsedBody.Exitcode
 	default:
-		log.Printf("%sError%s: Unknown response code from server: %s\n", ANSIRedFg, ANSIClearFg, res.Status)
+		log.Logn(fmt.Sprintf("%sError%s: Unknown response code from server: %s", ANSIRedFg, ANSIClearFg, res.Status))
 		return 14
 	}
 }
@@ -182,9 +182,9 @@ func RunFile(filename string, serverUrl string, cookies []*http.Cookie) {
 	startTime := time.Now()
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Println("Failed to read file: ", err.Error())
+		log.Logn("Failed to read file: ", err.Error())
 		os.Exit(1)
 	}
 	exitCode := Run(string(content), serverUrl, cookies)
-	fmt.Printf("Homescript finished with exit code: %d \x1b[90m[%ds]%s\n", exitCode, time.Since(startTime).Milliseconds(), ANSIClearFg)
+	log.Logn(fmt.Sprintf("Homescript finished with exit code: %d \x1b[90m[%ds]%s", exitCode, time.Since(startTime).Milliseconds(), ANSIClearFg))
 }

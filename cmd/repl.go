@@ -3,8 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
+	"os"
 	"time"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/debug"
@@ -17,23 +16,6 @@ var (
 	Switches  []Switch
 	DebugInfo debug.DebugInfo
 )
-
-func usage(w io.Writer) {
-	io.WriteString(w, "commands:\n")
-	io.WriteString(w, completer.Tree("    "))
-}
-
-// Function constructor - constructs new function for listing given directory
-func listFiles(path string) func(string) []string {
-	return func(line string) []string {
-		names := make([]string, 0)
-		files, _ := ioutil.ReadDir(path)
-		for _, f := range files {
-			names = append(names, f.Name())
-		}
-		return names
-	}
-}
 
 var completer = readline.NewPrefixCompleter(
 	readline.PcItem("switch",
@@ -58,19 +40,19 @@ func filterInput(r rune) (rune, bool) {
 
 func StartRepl() {
 	if Verbose {
-		log.Println("Fetching switches from Smarthome")
-		log.Println("Fetching server info from Smarthome")
+		logn("Fetching switches from Smarthome")
+		logn("Fetching server info from Smarthome")
 	}
 	getPersonalSwitches()
 	serverInfo, err := debug.GetDebugInfo(SmarthomeURL, SessionCookies)
 	if err != nil {
-		log.Println(err.Error())
+		loge(err.Error())
 	}
 	DebugInfo = serverInfo
 	if Verbose {
-		log.Println("Switches have been successfully fetched")
+		logn("Switches have been successfully fetched")
 	}
-	fmt.Println(fmt.Sprintf("Server: v%s:%s on \x1b[35m%s\x1b[0m", DebugInfo.ServerVersion, DebugInfo.GoVersion, SmarthomeURL), "\nWelcome to Homescript interactive.")
+	logn(fmt.Sprintf("Server: v%s:%s on \x1b[35m%s\x1b[0m", DebugInfo.ServerVersion, DebugInfo.GoVersion, SmarthomeURL), "\nWelcome to Homescript interactive v"+Version)
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m> ", Username),
 		HistoryFile:     "/tmp/homescript_history",
@@ -86,7 +68,7 @@ func StartRepl() {
 	}
 	defer l.Close()
 
-	log.SetOutput(l.Stderr())
+	// log.SetOutput(l.Stderr())
 	for {
 		line, err := l.Readline()
 		if err == readline.ErrInterrupt {
@@ -98,7 +80,9 @@ func StartRepl() {
 		} else if err == io.EOF {
 			break
 		}
-
+		if line == "exit" {
+			os.Exit(0)
+		}
 		startTime := time.Now()
 		exitCode := homescript.Run(line, SmarthomeURL, SessionCookies)
 		var display string

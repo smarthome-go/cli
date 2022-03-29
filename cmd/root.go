@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const Version = "0.4.0-beta"
+const Version = "0.4.1-beta"
 
 var (
 	Verbose  bool

@@ -1,5 +1,15 @@
 # homescript-cli
- 
+
+## REPL
+Homescript-cli's original purpose is to represent a powerful command-line-interface for the Smarthome server.
+Sample output of a *REPL* session can be found below
+```
+mik@mik-pc ~/g/s/g/M/smarthome (main) » homescript -i "http://cloud.box:8123" -u admin -p admin
+Server: v0.0.15-beta:go1.18 on http://cloud.box:8123
+Welcome to Homescript interactive v0.4.0-beta. CLI commands and comments start with #
+admin@homescript> switch('s2', off) 
+```
+
 ## Help Output
 ```
 mik@mik-pc ~/g/s/g/M/smarthome (main) » homescript --help

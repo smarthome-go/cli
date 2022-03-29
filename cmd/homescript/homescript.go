@@ -13,6 +13,8 @@ import (
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
+var Silent bool
+
 type RunRequest struct {
 	Code string `json:"code"`
 }
@@ -46,6 +48,11 @@ var (
 )
 
 func startSpinner(text string, ch *chan bool) {
+	if Silent {
+		// Just wait if silent
+		_ = <-*ch
+		return
+	}
 	positions := []string{"⠏", "⠛", "⠹", "⢸", "⣰", "⣤", "⣆", "⡇"}
 	fmt.Println()
 	fmt.Printf("\x1b[1F")

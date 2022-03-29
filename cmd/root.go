@@ -43,6 +43,8 @@ var (
 			"  - https://github.com/MikMuellerDev/smarthome\n",
 		Run: func(cmd *cobra.Command, args []string) {
 			log.InitLog(Verbose)
+			log.Silent = Silent
+			homescript.Silent = Silent
 			PingServer()
 			PromptLogin()
 			Login(true)
@@ -60,6 +62,8 @@ func Execute() {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			log.InitLog(Verbose)
+			log.Silent = Silent
+			homescript.Silent = Silent
 			PingServer()
 			PromptLogin()
 			Login(true)
@@ -73,6 +77,8 @@ func Execute() {
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			log.InitLog(Verbose)
+			log.Silent = Silent
+			homescript.Silent = Silent
 			PingServer()
 			PromptLogin()
 			Login(true)
@@ -90,6 +96,8 @@ func Execute() {
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			log.InitLog(Verbose)
+			log.Silent = Silent
+			homescript.Silent = Silent
 			PingServer()
 			Login(false)
 			homescript.Run(
@@ -106,6 +114,8 @@ func Execute() {
 		Args:  cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			log.InitLog(Verbose)
+			log.Silent = Silent
+			homescript.Silent = Silent
 			PingServer()
 			Login(true)
 			getPersonalSwitches()

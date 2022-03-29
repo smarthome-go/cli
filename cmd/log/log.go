@@ -5,10 +5,15 @@ import (
 	"os"
 )
 
+var Silent bool
+
 var normalLogger *log.Logger
 var errLogger *log.Logger
 
 func Logf(args ...string) {
+	if Silent {
+		return
+	}
 	output := ""
 	for _, arg := range args {
 		output += arg
@@ -17,6 +22,9 @@ func Logf(args ...string) {
 }
 
 func Logn(args ...string) {
+	if Silent {
+		return
+	}
 	output := ""
 	for _, arg := range args {
 		output += arg
@@ -25,6 +33,9 @@ func Logn(args ...string) {
 }
 
 func Loge(args ...string) {
+	if Silent {
+		return
+	}
 	output := ""
 	for _, arg := range args {
 		output += arg

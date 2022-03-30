@@ -98,6 +98,9 @@ func Login(doOutput bool) {
 
 // Tests if the server configuration is valid and the server is reachable
 func PingServer() {
+	if Verbose {
+		log.Logn(fmt.Sprintf("Pinging Smarthome server at '%s'", SmarthomeURL))
+	}
 	res, err := http.Get(fmt.Sprintf("%s/health", SmarthomeURL))
 	if err != nil {
 		log.Loge(fmt.Sprintf("Server ping \x1b[31mfailed\x1b[0m: failed to connect to \x1b[35m%s\x1b[0m. Check your server configuration", SmarthomeURL))

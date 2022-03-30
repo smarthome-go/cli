@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -24,6 +27,12 @@ var (
 	Username string
 	Password string
 )
+
+type Config struct {
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	SmarthomeUrl string `json:"smarthomeUrl"`
+}
 
 var (
 	rootCmd = &cobra.Command{
@@ -143,8 +152,44 @@ func Execute() {
 	rootCmd.AddCommand(cmdInfo)
 	rootCmd.AddCommand(cmdPipeIn)
 	rootCmd.AddCommand(cmdListSwitches)
+	readConfigFile()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
+	}
+}
+
+func readConfigFile() {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		log.Loge("Failed to determine user config directory")
+		return
+	}
+	configFilePath := fmt.Sprintf("%s/homescript.json", configDir)
+	_, err = os.Stat(configFilePath)
+	if os.IsNotExist(err) {
+		log.Logn("Config file does not exists")
+		return
+	}
+	fileContent, err := ioutil.ReadFile(configFilePath)
+	if err != nil {
+		log.Loge("Failed to read homescript config file")
+		return
+	}
+	decoder := json.NewDecoder(bytes.NewReader(fileContent))
+	decoder.DisallowUnknownFields()
+	var config Config
+	if err := decoder.Decode(&config); err != nil {
+		log.Loge("Failed to parse config file to struct: invalid json format: ", err.Error())
+		return
+	}
+	if Username == "" {
+		Username = config.Username
+	}
+	if Password == "" {
+		Username = config.Password
+	}
+	if SmarthomeURL == "" {
+		SmarthomeURL = config.SmarthomeUrl
 	}
 }

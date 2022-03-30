@@ -75,9 +75,16 @@ func StartRepl() {
 	}
 	initCompleter()
 	log.Logn(fmt.Sprintf("Server: v%s:%s on \x1b[35m%s\x1b[0m", DebugInfo.ServerVersion, DebugInfo.GoVersion, SmarthomeURL), fmt.Sprintf("\nWelcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m", Version))
+	cacheDir, err := os.UserCacheDir()
+	var historyFile string
+	if err != nil {
+		log.Loge("Failed to setup default history, user has no default caching directory, using fallback at `/tmp`")
+		historyFile = "/tmp/homescript.history"
+	}
+	historyFile = fmt.Sprintf("%s/homescript.history", cacheDir)
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m> ", Username),
-		HistoryFile:     "/tmp/homescript_history",
+		HistoryFile:     historyFile,
 		AutoComplete:    completer,
 		InterruptPrompt: "^C",
 		EOFPrompt:       "exit",

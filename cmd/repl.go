@@ -108,9 +108,11 @@ func StartRepl() {
 		if strings.ReplaceAll(line, " ", "") == "#verbose" {
 			log.InitLog(true)
 			log.Logn("Set output mode to verbose")
+			continue
 		}
 		if strings.ReplaceAll(line, " ", "") == "#switches" {
 			listSwitches()
+			continue
 		}
 
 		startTime := time.Now()

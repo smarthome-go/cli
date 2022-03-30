@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
@@ -101,7 +102,7 @@ func Execute() {
 			PingServer()
 			Login(false)
 			homescript.Run(
-				`print(debugInfo)`,
+				strings.Join(args, " \n"),
 				SmarthomeURL,
 				SessionCookies,
 			)

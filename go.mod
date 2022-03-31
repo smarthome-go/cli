@@ -5,6 +5,7 @@ go 1.18
 require github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 
 require (
+	github.com/MikMuellerDev/homescript v0.2.5-beta // indirect
 	github.com/chzyer/logex v1.2.0 // indirect
 	github.com/chzyer/test v0.0.0-20210722231415-061457976a23 // indirect
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect

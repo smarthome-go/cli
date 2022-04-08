@@ -9,12 +9,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
-	"github.com/spf13/cobra"
 )
 
-const Version = "0.4.1-beta"
+const Version = "0.5.0-beta"
 
 var (
 	Verbose  bool

@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 	"github.com/howeyc/gopass"
+
+	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
 // The login function prompts the user to enter his password and username (if not provided via flag)
@@ -109,8 +110,8 @@ func PingServer() {
 	switch res.StatusCode {
 	case 200:
 	case 503:
-		log.Loge("Server ping failed (\x1b[31m503\x1b[0m): Smarthome is currently unavailable")
-		os.Exit(2)
+		log.Loge("Smarthome may be in a degraded state (\x1b[33m503\x1b[0m): some services are currently unavailable")
+		return
 	default:
 		log.Loge(fmt.Sprintf("Server ping failed (\x1b[31m%s\x1b[0m): server responded with unknown response code", res.Status))
 		os.Exit(3)

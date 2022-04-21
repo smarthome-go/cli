@@ -7,7 +7,6 @@ import (
 )
 
 func listSwitches() {
-	// log.Logn("\u2502Id          \u2502 Label	            \u2502   Room     \u2502 Watts")
 	// TODO: add power indicator
 	log.Logn("\x1b[90m(Id, Label, Room, Watts)\x1b[0m")
 	for _, switchItem := range Switches {

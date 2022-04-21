@@ -59,22 +59,34 @@ func GetDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(fmt.Sprintf("Failed to fetch debug info: %s", err.Error()))
-		return DebugInfo{}, err
+		return DebugInfo{
+			ServerVersion: "_unknown",
+			GoVersion:     "go_unknown",
+		}, err
 	}
 	if res.StatusCode > 299 {
-		log.Println(fmt.Sprintf("Failed to debug info: non-200 status code %s", res.Status))
-		return DebugInfo{}, err
+		log.Println(fmt.Sprintf("Failed to fetch debug info: non-200 status code %s", res.Status))
+		return DebugInfo{
+			ServerVersion: "_unknown",
+			GoVersion:     "go_unknown",
+		}, err
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Println(fmt.Sprintf("Failed to fetch debug info: could not parse response: %s", res.Status))
-		return DebugInfo{}, err
+		return DebugInfo{
+			ServerVersion: "_unknown",
+			GoVersion:     "go_unknown",
+		}, err
 	}
 	var parsedBody DebugInfo
 	if err := json.Unmarshal(body, &parsedBody); err != nil {
 		log.Println("Failed to fetch debug info: ", err.Error())
-		return DebugInfo{}, err
+		return DebugInfo{
+			ServerVersion: "_unknown",
+			GoVersion:     "go_unknown",
+		}, err
 	}
 	return parsedBody, nil
 }

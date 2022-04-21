@@ -15,7 +15,7 @@ import (
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
-const Version = "0.5.1-beta"
+const Version = "0.5.2-beta"
 
 var (
 	Verbose  bool

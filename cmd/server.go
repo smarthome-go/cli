@@ -12,10 +12,11 @@ import (
 
 // Used when starting a REPL session (for autocompletion)
 type Switch struct {
-	Id     string `json:"id"`
-	Name   string `json:"name"`
-	RoomId string `json:"roomId"`
-	Watts  uint   `json:"watts"`
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	RoomId  string `json:"roomId"`
+	PowerOn bool   `json:"powerOn"`
+	Watts   uint   `json:"watts"`
 }
 
 // Fetches the available user switches from the smarthome server

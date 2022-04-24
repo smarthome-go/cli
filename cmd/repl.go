@@ -9,7 +9,6 @@ import (
 
 	"github.com/chzyer/readline"
 
-	"github.com/MikMuellerDev/homescript-cli/cmd/debug"
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
@@ -17,7 +16,7 @@ import (
 var (
 	History   []string
 	Switches  []Switch
-	DebugInfo debug.DebugInfo
+	DebugInfo DebugInfoData
 )
 
 var completer *readline.PrefixCompleter
@@ -57,6 +56,7 @@ func initCompleter() {
 		readline.PcItem("#exit"),
 		readline.PcItem("#verbose"),
 		readline.PcItem("#switches"),
+		readline.PcItem("#debug"),
 	)
 }
 
@@ -65,15 +65,7 @@ func StartRepl() {
 		log.Logn("Fetching switches from Smarthome")
 		log.Logn("Fetching server info from Smarthome")
 	}
-	getPersonalSwitches()
-	serverInfo, err := debug.GetDebugInfo(SmarthomeURL, SessionCookies)
-	if err != nil {
-		log.Loge(err.Error())
-	}
-	DebugInfo = serverInfo
-	if Verbose {
-		log.Logn("Switches have been successfully fetched")
-	}
+	GetDebugInfo()
 	initCompleter()
 	log.Logn(fmt.Sprintf("Server: v%s:%s on \x1b[35m%s\x1b[0m", DebugInfo.ServerVersion, DebugInfo.GoVersion, SmarthomeURL), fmt.Sprintf("\nWelcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m", Version))
 	cacheDir, err := os.UserCacheDir()
@@ -120,6 +112,10 @@ func StartRepl() {
 		}
 		if strings.ReplaceAll(line, " ", "") == "#switches" {
 			listSwitches()
+			continue
+		}
+		if strings.ReplaceAll(line, " ", "") == "#debug" {
+			debugInfo()
 			continue
 		}
 

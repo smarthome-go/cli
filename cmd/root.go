@@ -60,7 +60,6 @@ var (
 			PromptLogin()
 			Login(true)
 			StartRepl()
-			// fmt.Print("\x1b[3J\033c")
 		},
 	}
 )
@@ -82,7 +81,7 @@ func Execute() {
 		},
 	}
 	cmdInfo := &cobra.Command{
-		Use:   "info",
+		Use:   "debug",
 		Short: "Smarthome Server Debug Info",
 		Long:  "Prints debugging information about the server",
 		Args:  cobra.ExactArgs(0),
@@ -93,11 +92,7 @@ func Execute() {
 			PingServer()
 			PromptLogin()
 			Login(true)
-			homescript.Run(
-				`print(debugInfo)`,
-				SmarthomeURL,
-				SessionCookies,
-			)
+			debugInfo()
 		},
 	}
 	cmdPipeIn := &cobra.Command{

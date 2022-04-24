@@ -47,7 +47,7 @@ var (
 	ANSIClearFg ANSICode = "\x1b[0m"
 )
 
-func startSpinner(text string, ch *chan bool) {
+func StartSpinner(text string, ch *chan bool) {
 	if Silent {
 		// Just wait if silent
 		_ = <-*ch
@@ -75,7 +75,6 @@ func startSpinner(text string, ch *chan bool) {
 
 func printError(err HomescriptError, program string) {
 	lines := strings.Split(program, "\n")
-
 	line1 := ""
 	if err.Location.Line > 1 {
 		line1 = fmt.Sprintf("\n \x1b[90m%- 3d | \x1b[0m%s", err.Location.Line-1, lines[err.Location.Line-2])
@@ -104,7 +103,7 @@ func printError(err HomescriptError, program string) {
 
 func Run(scriptCode string, serverUrl string, cookies []*http.Cookie) int {
 	ch := make(chan bool)
-	go startSpinner("Executing homescript", &ch)
+	go StartSpinner("Executing homescript", &ch)
 	url := fmt.Sprintf("%s/api/homescript/run/live", serverUrl)
 	requestBody, err := json.Marshal(RunRequest{
 		Code: scriptCode,

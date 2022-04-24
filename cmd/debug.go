@@ -1,13 +1,11 @@
-package debug
+package cmd
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
-	"strings"
-
 	"log"
+	"net/http"
 )
 
 type DBStatus struct {
@@ -27,7 +25,7 @@ type JobResult struct {
 	Error error `json:"error"`
 }
 
-type DebugInfo struct {
+type DebugInfoData struct {
 	ServerVersion          string      `json:"version"`
 	DatabaseOnline         bool        `json:"databaseOnline"`
 	DatabaseStats          DBStatus    `json:"databaseStats"`
@@ -42,13 +40,13 @@ type DebugInfo struct {
 }
 
 // Fetches debug information from the smarthome server
-func GetDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
+func GetDebugInfo() error {
 	req, err := http.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/api/debug", url),
+		fmt.Sprintf("%s/api/debug", SmarthomeURL),
 		nil,
 	)
-	for _, cookie := range cookies {
+	for _, cookie := range SessionCookies {
 		req.AddCookie(
 			&http.Cookie{
 				Name:  cookie.Name,
@@ -59,57 +57,39 @@ func GetDebugInfo(url string, cookies []*http.Cookie) (DebugInfo, error) {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(fmt.Sprintf("Failed to fetch debug info: %s", err.Error()))
-		return DebugInfo{
+		DebugInfo = DebugInfoData{
 			ServerVersion: "_unknown",
 			GoVersion:     "go_unknown",
-		}, err
+		}
+		return err
 	}
 	if res.StatusCode > 299 {
 		log.Println(fmt.Sprintf("Failed to fetch debug info: non-200 status code %s", res.Status))
-		return DebugInfo{
+		DebugInfo = DebugInfoData{
 			ServerVersion: "_unknown",
 			GoVersion:     "go_unknown",
-		}, err
+		}
+		return err
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Println(fmt.Sprintf("Failed to fetch debug info: could not parse response: %s", res.Status))
-		return DebugInfo{
+		DebugInfo = DebugInfoData{
 			ServerVersion: "_unknown",
 			GoVersion:     "go_unknown",
-		}, err
+		}
+		return err
 	}
-	var parsedBody DebugInfo
+	var parsedBody DebugInfoData
 	if err := json.Unmarshal(body, &parsedBody); err != nil {
 		log.Println("Failed to fetch debug info: ", err.Error())
-		return DebugInfo{
+		DebugInfo = DebugInfoData{
 			ServerVersion: "_unknown",
 			GoVersion:     "go_unknown",
-		}, err
+		}
+		return err
 	}
-	return parsedBody, nil
-}
-
-func GetServerInfo(url string, cookies []*http.Cookie) (string, error) {
-	debugInfo, err := GetDebugInfo(url, cookies)
-	if err != nil {
-		return "", err
-	}
-	var output string
-	output += fmt.Sprintf("%s\n", strings.Repeat("\u2015", 45))
-	output += fmt.Sprintf(" Smarthome Server Version: %s │ v%s\n", strings.Repeat(" ", 30-len("Smarthome Server Version: ")), debugInfo.ServerVersion)
-	var databaseOnlineString = "\x1b[1;31mNO\x1b[1;0m"
-	if debugInfo.DatabaseOnline {
-		databaseOnlineString = "\x1b[1;32mYES\x1b[1;0m"
-	}
-	output += fmt.Sprintf(" Database Online: %s │ %- 10s\n", strings.Repeat(" ", 30-len("Database Online: ")), databaseOnlineString)
-	output += fmt.Sprintf(" Compiled with: %s │ %- 10s\n", strings.Repeat(" ", 30-len("Compiled with: ")), debugInfo.GoVersion)
-	output += fmt.Sprintf(" CPU Cores: %s │ %d\n", strings.Repeat(" ", 30-len("CPU Cores: ")), debugInfo.CpuCores)
-	output += fmt.Sprintf(" Current Goroutines: %s │ %d\n", strings.Repeat(" ", 30-len("Current Goroutines: ")), debugInfo.Goroutines)
-	output += fmt.Sprintf(" Current Memory Usage: %s │ %d\n", strings.Repeat(" ", 30-len("Current Memory Usage: ")), debugInfo.MemoryUsage)
-	output += fmt.Sprintf(" Current Power Jobs: %s │ %d\n", strings.Repeat(" ", 30-len("Current Power Jobs: ")), debugInfo.PowerJobCount)
-	output += fmt.Sprintf(" Last Power Job Error Count: %s │ %d\n", strings.Repeat(" ", 30-len("Last Power Job Error Count: ")), debugInfo.PowerJobWithErrorCount)
-	output += fmt.Sprintf("%s", strings.Repeat("\u2015", 45))
-	return output, nil
+	DebugInfo = parsedBody
+	return nil
 }

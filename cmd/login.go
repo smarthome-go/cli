@@ -9,6 +9,7 @@ import (
 
 	"github.com/howeyc/gopass"
 
+	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
@@ -50,6 +51,8 @@ type LoginRequest struct {
 
 // Tests if the provided credentials are valid
 func Login(doOutput bool) {
+	ch := make(chan bool)
+	go homescript.StartSpinner("Checking Credentials", &ch)
 	body, err := json.Marshal(
 		LoginRequest{
 			Username: Username,
@@ -95,6 +98,7 @@ func Login(doOutput bool) {
 	if Verbose {
 		log.Logn("Login successful: you are now authenticated as: ", Username)
 	}
+	ch <- true
 }
 
 // Tests if the server configuration is valid and the server is reachable

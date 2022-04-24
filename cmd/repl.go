@@ -7,10 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chzyer/readline"
+
 	"github.com/MikMuellerDev/homescript-cli/cmd/debug"
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
-	"github.com/chzyer/readline"
 )
 
 var (
@@ -80,8 +81,9 @@ func StartRepl() {
 	if err != nil {
 		log.Loge("Failed to setup default history, user has no default caching directory, using fallback at `/tmp`")
 		historyFile = "/tmp/homescript.history"
+	} else {
+		historyFile = fmt.Sprintf("%s/homescript.history", cacheDir)
 	}
-	historyFile = fmt.Sprintf("%s/homescript.history", cacheDir)
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m> ", Username),
 		HistoryFile:     historyFile,
@@ -97,7 +99,6 @@ func StartRepl() {
 	}
 	defer l.Close()
 
-	// log.SetOutput(l.Stderr())
 	for {
 		line, err := l.Readline()
 		if err == readline.ErrInterrupt {

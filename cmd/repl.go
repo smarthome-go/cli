@@ -63,9 +63,10 @@ func initCompleter() {
 func StartRepl() {
 	if Verbose {
 		log.Logn("Fetching switches from Smarthome")
-		log.Logn("Fetching server info from Smarthome")
+		log.Logn("Fetching debug info from Smarthome")
 	}
-	GetDebugInfo()
+	getPersonalSwitches()
+	_ = GetDebugInfo()
 	initCompleter()
 	log.Logn(fmt.Sprintf("Server: v%s:%s on \x1b[35m%s\x1b[0m", DebugInfo.ServerVersion, DebugInfo.GoVersion, SmarthomeURL), fmt.Sprintf("\nWelcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m", Version))
 	cacheDir, err := os.UserCacheDir()

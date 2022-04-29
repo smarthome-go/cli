@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,12 +8,13 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
 	"github.com/MikMuellerDev/homescript-cli/cmd/log"
 )
 
-const Version = "0.6.1-beta"
+const Version = "0.6.2-beta"
 
 var (
 	Verbose  bool
@@ -29,10 +28,10 @@ var (
 	Password string
 )
 
-type Config struct {
-	Username     string `json:"username"`
-	Password     string `json:"password"`
-	SmarthomeUrl string `json:"smarthomeUrl"`
+var Config = map[string]string{
+	Username:     "",
+	Password:     "",
+	SmarthomeURL: "",
 }
 
 var (
@@ -134,16 +133,7 @@ func Execute() {
 	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "smarthome password used for connection")
 	rootCmd.PersistentFlags().StringVarP(&SmarthomeURL, "ip", "i", "http://localhost", "Url used for connecting to smarthome")
 	log.InitLog(true)
-	// Environment variables, same as the ones used in the docker image
-	/*
-		`SMARTHOME_ADMIN_PASSWORD`: Checks for the smarthome admin user
-	*/
-	if adminPassword, adminPasswordOk := os.LookupEnv("SMARTHOME_ADMIN_PASSWORD"); adminPasswordOk && Password == "" {
-		Password = adminPassword
-		if Verbose {
-			log.Logn("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
-		}
-	}
+
 	rootCmd.AddCommand(cmdRun)
 	rootCmd.AddCommand(cmdInfo)
 	rootCmd.AddCommand(cmdPipeIn)
@@ -161,10 +151,15 @@ func readConfigFile() {
 		log.Loge("Failed to determine user config directory")
 		return
 	}
-	configFilePath := fmt.Sprintf("%s/homescript.json", configDir)
+	configFilePath := fmt.Sprintf("%s/homescript.yaml", configDir)
 	_, err = os.Stat(configFilePath)
 	if os.IsNotExist(err) {
-		log.Logn("Config file does not exists")
+		log.Logn("Config file does not exists, creating...")
+		if err := os.WriteFile(configFilePath, []byte("Username: user\nPassword: password\nSmarthomeURL: http://localhost"), 0600); err != nil {
+			log.Loge("Could not create config file: ", err.Error())
+			return
+		}
+		log.Logn("...created")
 		return
 	}
 	fileContent, err := ioutil.ReadFile(configFilePath)
@@ -172,20 +167,26 @@ func readConfigFile() {
 		log.Loge("Failed to read homescript config file")
 		return
 	}
-	decoder := json.NewDecoder(bytes.NewReader(fileContent))
-	decoder.DisallowUnknownFields()
-	var config Config
-	if err := decoder.Decode(&config); err != nil {
-		log.Loge("Failed to parse config file to struct: invalid json format: ", err.Error())
+	if err := yaml.Unmarshal(fileContent, &Config); err != nil {
+		log.Loge(fmt.Sprintf("Failed to parse config file at %s: invalid YAML format: %s", configFilePath, err.Error()))
 		return
 	}
 	if Username == "" {
-		Username = config.Username
+		if Verbose {
+			log.Logn("Selected username from config file.")
+		}
+		Username = Config["Username"]
 	}
 	if Password == "" {
-		Username = config.Password
+		if Verbose {
+			log.Logn("Selected password from config file.")
+		}
+		Password = Config["Password"]
 	}
-	if SmarthomeURL == "" {
-		SmarthomeURL = config.SmarthomeUrl
+	if SmarthomeURL == "http://localhost" {
+		if Verbose {
+			log.Logn("Selected smarthome-url from config file.")
+		}
+		SmarthomeURL = Config["SmarthomeURL"]
 	}
 }

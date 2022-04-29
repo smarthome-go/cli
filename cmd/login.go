@@ -26,7 +26,16 @@ func PromptLogin() {
 		Username = username
 	} else {
 		if Verbose {
-			log.Logn("Username already set from args")
+			log.Logn("Username already set")
+		}
+	}
+	/*
+		`SMARTHOME_ADMIN_PASSWORD`: Checks for the smarthome admin user
+	*/
+	if adminPassword, adminPasswordOk := os.LookupEnv("SMARTHOME_ADMIN_PASSWORD"); adminPasswordOk && Password == "" && Username == "admin" {
+		Password = adminPassword
+		if Verbose {
+			log.Logn("Found password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m")
 		}
 	}
 	if Password == "" {

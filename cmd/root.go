@@ -154,7 +154,7 @@ func readConfigFile() {
 	configFilePath := fmt.Sprintf("%s/homescript.yaml", configDir)
 	_, err = os.Stat(configFilePath)
 	if os.IsNotExist(err) {
-		log.Logn("Config file does not exists, creating...")
+		log.Logn("Config file does not exist, creating...")
 		if err := os.WriteFile(configFilePath, []byte("Username: user\nPassword: password\nSmarthomeURL: http://localhost"), 0600); err != nil {
 			log.Loge("Could not create config file: ", err.Error())
 			return

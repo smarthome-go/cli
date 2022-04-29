@@ -30,7 +30,6 @@ func listSwitches() {
 		}
 		tbl.AddRow(switchItem.Id, switchItem.Name, switchItem.RoomId, powerIndicator, switchItem.Watts)
 	}
-
 	tbl.Print()
 }
 

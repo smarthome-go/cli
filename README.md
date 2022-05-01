@@ -35,6 +35,7 @@ Available Commands:
   debug       Smarthome Server Debug Info
   help        Help about any command
   pipe        Run Code via Stdin
+  power       Power Summary
   run         Run a homescript file
   switches    List switches
 

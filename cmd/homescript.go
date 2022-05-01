@@ -41,9 +41,10 @@ func printError(err smarthome_sdk.HomescriptError, program string) {
 
 // Executes an arbitrary string of Homescript code
 // Error handling is done internally and printed directly
-func RunCode(code string) int {
+func RunCode(code string, filename string) int {
 	s := spinner.New([]string{"⠏", "⠛", "⠹", "⢸", "⣰", "⣤", "⣆", "⡇"}, 100*time.Millisecond)
 	s.Prefix = "Executing Homescript "
+	s.FinalMSG = ""
 	start := time.Now()
 	ch := make(chan struct{})
 	go func(ch *chan struct{}) {
@@ -60,20 +61,19 @@ func RunCode(code string) int {
 		}
 	}(&ch)
 	output, err := Connection.RunHomescript(code, time.Minute*2)
+	ch <- struct{}{}
 	if err != nil {
-		switch err {
-		case smarthome_sdk.ErrPermissionDenied:
-			ch <- struct{}{}
+		if err == smarthome_sdk.ErrPermissionDenied {
 			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
 			return 403
 		}
-		ch <- struct{}{}
+		fmt.Println(err.Error())
 		return 99
 	}
 	if !output.Success || output.Exitcode != 0 {
-		ch <- struct{}{}
 		fmt.Printf("Error: Program terminated abnormally with exit-code %d\n", output.Exitcode)
 		for _, errorItem := range output.Errors {
+			errorItem.Location.Filename = filename
 			printError(errorItem, code)
 		}
 		return output.Exitcode
@@ -81,6 +81,5 @@ func RunCode(code string) int {
 	if output.Output != "" {
 		fmt.Printf("\x1b[90m%s\x1b[0m\n", output.Output)
 	}
-	ch <- struct{}{}
 	return output.Exitcode
 }

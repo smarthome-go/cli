@@ -19,12 +19,16 @@ func readConfigFile() {
 	configFilePath := fmt.Sprintf("%s/homescript.yaml", configDir)
 	_, err = os.Stat(configFilePath)
 	if os.IsNotExist(err) {
-		fmt.Println("Config file does not exist, creating...")
+		if Verbose {
+			fmt.Println("Configuration file does not exist, creating...")
+		}
 		if err := os.WriteFile(configFilePath, []byte("Username: user\nPassword: password\nSmarthomeURL: http://localhost"), 0600); err != nil {
 			fmt.Println("Could not create config file: ", err.Error())
 			return
 		}
-		fmt.Println("...created")
+		if Verbose {
+			fmt.Printf("Created new configuration at %s\n", configFilePath)
+		}
 		return
 	}
 	fileContent, err := ioutil.ReadFile(configFilePath)
@@ -36,19 +40,19 @@ func readConfigFile() {
 		fmt.Println(fmt.Sprintf("Failed to parse config file at %s: invalid YAML format: %s", configFilePath, err.Error()))
 		os.Exit(1)
 	}
-	if Username == "" {
+	if Username == "" && Config["Username"] != "" {
 		if Verbose {
 			fmt.Println("Selected username from config file.")
 		}
 		Username = Config["Username"]
 	}
-	if Password == "" {
+	if Password == "" && Config["Password"] != "" {
 		if Verbose {
 			fmt.Println("Selected password from config file.")
 		}
 		Password = Config["Password"]
 	}
-	if Url == "http://localhost" {
+	if Url == "http://localhost" && Config["SmarthomeURL"] != "http://localhost" {
 		if Verbose {
 			fmt.Println("Selected smarthome-url from config file.")
 		}
@@ -113,6 +117,9 @@ func writeConfig(username string, password string, smarthomeUrl string) {
 }
 
 func deleteConfigFile() {
+	if Verbose {
+		fmt.Println("Deleting configuration file...")
+	}
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		fmt.Println("Failed to delete configuration file: could not determine user's config directory")
@@ -128,4 +135,5 @@ func deleteConfigFile() {
 		fmt.Println("Failed to delete configuration file: ", err.Error())
 		os.Exit(1)
 	}
+	fmt.Printf("Successfully deleted configuration file from %s\n", configFilePath)
 }

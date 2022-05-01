@@ -189,7 +189,7 @@ func StartRepl() {
 		}
 
 		startTime := time.Now()
-		exitCode := RunCode(line)
+		exitCode := RunCode(line, "repl")
 		var display string
 		if exitCode != 0 {
 			display = fmt.Sprintf(" \x1b[31m[%d]\x1b[0m", exitCode)

@@ -49,3 +49,8 @@ Flags:
 
 Use "homescript [command] --help" for more information about a command.
 ```
+
+## Installation of v2.0.0-beta (form AMD64)
+```
+cd /tmp && wget https://github.com/MikMuellerDev/homescript-cli/releases/download/v2.0.0-beta/homescript_linux_amd64.tar.gz && tar -xvf homescript_linux_amd64.tar.gz && sudo mv homescript /usr/bin && rm -rf homescript_linux_amd64.tar.gz
+```

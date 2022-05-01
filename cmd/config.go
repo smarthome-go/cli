@@ -22,7 +22,7 @@ func readConfigFile() {
 		if Verbose {
 			fmt.Println("Configuration file does not exist, creating...")
 		}
-		if err := os.WriteFile(configFilePath, []byte("Username: user\nPassword: password\nSmarthomeURL: http://localhost"), 0600); err != nil {
+		if err := os.WriteFile(configFilePath, []byte("Username:\nPassword:\nSmarthomeURL: http://localhost"), 0600); err != nil {
 			fmt.Println("Could not create config file: ", err.Error())
 			return
 		}

@@ -14,6 +14,7 @@ import (
 func InitConn() {
 	s := spinner.New(spinner.CharSets[59], 150*time.Millisecond)
 	s.Prefix = "Connecting to Smarthome "
+	PromptLogin()
 	s.Start()
 	conn, err := smarthome_sdk.NewConnection(Url, smarthome_sdk.AuthMethodCookie)
 	if err != nil {

@@ -9,17 +9,14 @@ import (
 
 	"github.com/chzyer/readline"
 
-	"github.com/MikMuellerDev/homescript-cli/cmd/homescript"
-	"github.com/MikMuellerDev/homescript-cli/cmd/log"
+	"github.com/MikMuellerDev/smarthome_sdk"
 )
 
 var (
 	History   []string
-	Switches  []Switch
-	DebugInfo DebugInfoData
+	Switches  []smarthome_sdk.Switch
+	completer *readline.PrefixCompleter
 )
-
-var completer *readline.PrefixCompleter
 
 func filterInput(r rune) (rune, bool) {
 	switch r {
@@ -62,17 +59,37 @@ func initCompleter() {
 
 func StartRepl() {
 	if Verbose {
-		log.Logn("Fetching switches from Smarthome")
-		log.Logn("Fetching debug info from Smarthome")
+		fmt.Println("Fetching switches from Smarthome...")
+		fmt.Println("Fetching debug info from Smarthome...")
 	}
-	getPersonalSwitches()
-	_ = GetDebugInfo()
+	// Fetch the user switches
+	switches, err := Connection.GetPersonalSwitches()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	Switches = switches
+
+	// Try to fetch debug information
+	hasFetchedDebug := true
+	debugInfo, err := Connection.GetDebugInfo()
+	if err != nil {
+		switch err {
+		case smarthome_sdk.ErrConnFailed:
+			fmt.Printf("Failed to fetch debug info: connection to Smarthome (%s) interrupted.\n", Connection.SmarthomeURL.Hostname())
+		case smarthome_sdk.ErrPermissionDenied:
+			fmt.Printf("Your user (%s) does not have the permission to view debug information.\n", Connection.Username)
+		}
+		hasFetchedDebug = false
+	}
 	initCompleter()
-	log.Logn(fmt.Sprintf("Server: v%s:%s on \x1b[35m%s\x1b[0m", DebugInfo.ServerVersion, DebugInfo.GoVersion, SmarthomeURL), fmt.Sprintf("\nWelcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m", Version))
+	fmt.Printf("Welcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m\n", Version)
+	if hasFetchedDebug {
+		fmt.Printf("Server: v%s:%s on \x1b[35m%s\x1b[0m\n", debugInfo.ServerVersion, debugInfo.GoVersion, Url)
+	}
 	cacheDir, err := os.UserCacheDir()
 	var historyFile string
 	if err != nil {
-		log.Loge("Failed to setup default history, user has no default caching directory, using fallback at `/tmp`")
+		fmt.Println("Failed to setup default history, user has no default caching directory, using fallback at `/tmp`")
 		historyFile = "/tmp/homescript.history"
 	} else {
 		historyFile = fmt.Sprintf("%s/homescript.history", cacheDir)
@@ -107,8 +124,8 @@ func StartRepl() {
 			os.Exit(0)
 		}
 		if strings.ReplaceAll(line, " ", "") == "#verbose" {
-			log.InitLog(true)
-			log.Logn("Set output mode to verbose")
+			Verbose = true
+			fmt.Println("Set output mode to verbose")
 			continue
 		}
 		if strings.ReplaceAll(line, " ", "") == "#switches" {
@@ -116,12 +133,55 @@ func StartRepl() {
 			continue
 		}
 		if strings.ReplaceAll(line, " ", "") == "#debug" {
-			debugInfo()
+			printDebugInfo()
+			continue
+		}
+		if strings.ReplaceAll(line, " ", "") == "#config" {
+			printConfig()
+			continue
+		}
+		if strings.ReplaceAll(line, " ", "") == "#wipe" {
+			if Verbose {
+				fmt.Println("History has been deleted.")
+			}
+			l.ResetHistory()
+			continue
+		}
+		if strings.ReplaceAll(line, " ", "") == "#reload" {
+			// Reconnect
+			InitConn()
+
+			// Fetch the user switches again
+			switches, err := Connection.GetPersonalSwitches()
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			Switches = switches
+
+			// Generate new autocompletions based on new switches
+			initCompleter()
+			l.Refresh()
+
+			// Reinitialize readline
+			l, err = readline.NewEx(&readline.Config{
+				Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m> ", Username),
+				HistoryFile:     historyFile,
+				AutoComplete:    completer,
+				InterruptPrompt: "^C",
+				EOFPrompt:       "exit",
+
+				HistorySearchFold:   true,
+				FuncFilterInputRune: filterInput,
+			})
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			fmt.Println("Session has been reloaded.")
 			continue
 		}
 
 		startTime := time.Now()
-		exitCode := homescript.Run(line, SmarthomeURL, SessionCookies)
+		exitCode := RunCode(line)
 		var display string
 		if exitCode != 0 {
 			display = fmt.Sprintf(" \x1b[31m[%d]\x1b[0m", exitCode)

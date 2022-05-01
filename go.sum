@@ -1,5 +1,7 @@
 github.com/MikMuellerDev/smarthome_sdk v0.1.0 h1:euDbPYCuvjmA4CcLYIvfXCYB2mrVzhXmBZ6ER6+RkRc=
 github.com/MikMuellerDev/smarthome_sdk v0.1.0/go.mod h1:cDoxMhOC/uRgorkB4cfltxy2oBZhQDpkdP6P3uyhG6c=
+github.com/MikMuellerDev/smarthome_sdk v0.2.0 h1:ZX164LhtZvI+gxAj9lBcBfLK8PqNPrS+6svwDnkxQ3w=
+github.com/MikMuellerDev/smarthome_sdk v0.2.0/go.mod h1:cDoxMhOC/uRgorkB4cfltxy2oBZhQDpkdP6P3uyhG6c=
 github.com/briandowns/spinner v1.18.1 h1:yhQmQtM1zsqFsouh09Bk/jCjd50pC3EOGsh28gLVvwY=
 github.com/briandowns/spinner v1.18.1/go.mod h1:mQak9GHqbspjC/5iUx3qMlIho8xBS/ppAL/hX5SmPJU=
 github.com/chzyer/logex v1.2.0 h1:+eqR0HfOetur4tgnC8ftU5imRnhi4te+BadWS95c5AM=

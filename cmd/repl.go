@@ -51,9 +51,13 @@ func initCompleter() {
 			readline.PcItem("(user)"),
 		),
 		readline.PcItem("#exit"),
-		readline.PcItem("#verbose"),
 		readline.PcItem("#switches"),
+		readline.PcItem("#power"),
 		readline.PcItem("#debug"),
+		readline.PcItem("#config"),
+		readline.PcItem("#verbose"),
+		readline.PcItem("#wipe"),
+		readline.PcItem("#reload"),
 	)
 }
 
@@ -130,6 +134,10 @@ func StartRepl() {
 		}
 		if strings.ReplaceAll(line, " ", "") == "#switches" {
 			listSwitches()
+			continue
+		}
+		if strings.ReplaceAll(line, " ", "") == "#power" {
+			powerStats()
 			continue
 		}
 		if strings.ReplaceAll(line, " ", "") == "#debug" {

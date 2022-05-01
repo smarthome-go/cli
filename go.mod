@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	github.com/MikMuellerDev/smarthome_sdk v0.1.0
+	github.com/MikMuellerDev/smarthome_sdk v0.2.0
 	github.com/briandowns/spinner v1.18.1
 	github.com/fatih/color v1.13.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect

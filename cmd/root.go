@@ -64,7 +64,7 @@ func Execute() {
 		Use:   "debug",
 		Short: "Smarthome Server Debug Info",
 		Long:  "Prints debugging information about the server",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			InitConn()
 			printDebugInfo()
@@ -82,10 +82,20 @@ func Execute() {
 		Use:   "switches",
 		Short: "List switches",
 		Long:  "List switches of the current user",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			InitConn()
 			listSwitches()
+		},
+	}
+	cmdPowerSummary := &cobra.Command{
+		Use:   "power",
+		Short: "Power Summary",
+		Long:  "A compact overview of estimated power usage and states",
+		Args:  cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			powerStats()
 		},
 	}
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
@@ -97,6 +107,7 @@ func Execute() {
 	rootCmd.AddCommand(cmdInfo)
 	rootCmd.AddCommand(cmdPipeIn)
 	rootCmd.AddCommand(cmdListSwitches)
+	rootCmd.AddCommand(cmdPowerSummary)
 
 	// Parent configuration commands
 	cmdConfig := &cobra.Command{

@@ -12,8 +12,7 @@ admin@homescript> switch('s2', off)
 
 ## Help Output
 ```
-mik@mik-pc ~/g/s/g/M/smarthome (main) » homescript --help
-homescript-cli v0.4.0-beta : A command line interface for the smarthome server using homescript
+homescript-cli v2.0.0-beta-rc.1 : A command line interface for the smarthome server using homescript
 A working and set-up Smarthome server instance is required.
 For more information and usage documentation visit:
 
@@ -32,17 +31,17 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
+  config      REPL configuration
+  debug       Smarthome Server Debug Info
   help        Help about any command
-  info        Smarthome Server Debug Info
   pipe        Run Code via Stdin
   run         Run a homescript file
   switches    List switches
 
 Flags:
   -h, --help              help for homescript
-  -i, --ip string         Url used for connecting to smarthome (default "http://localhost")
-  -p, --password string   smarthome password used for connection
-  -s, --silent            no output
+  -i, --ip string         URL used for connecting to Smarthome (default "http://localhost")
+  -p, --password string   the user's password used for connection
   -u, --username string   smarthome user used for connection
   -v, --verbose           verbose output
       --version           version for homescript

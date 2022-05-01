@@ -12,7 +12,7 @@ import (
 	"github.com/MikMuellerDev/smarthome_sdk"
 )
 
-const Version = "2.0.0-beta-rc.1"
+const Version = "2.0.0-beta"
 
 var (
 	Verbose  bool

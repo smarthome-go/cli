@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/chzyer/readline"
 
 	"github.com/MikMuellerDev/smarthome_sdk"
@@ -62,13 +63,17 @@ func initCompleter() {
 }
 
 func StartRepl() {
+	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+	s.Suffix = " Preparing REPL"
 	if Verbose {
-		fmt.Println("Fetching switches from Smarthome...")
-		fmt.Println("Fetching debug info from Smarthome...")
+		fmt.Println("Fetching switches from Smarthome")
+		fmt.Println("Fetching debug info from Smarthome")
 	}
+	s.Start()
 	// Fetch the user switches
 	switches, err := Connection.GetPersonalSwitches()
 	if err != nil {
+		defer s.Stop()
 		fmt.Println(err.Error())
 	}
 	Switches = switches
@@ -77,6 +82,7 @@ func StartRepl() {
 	hasFetchedDebug := true
 	debugInfo, err := Connection.GetDebugInfo()
 	if err != nil {
+		defer s.Stop()
 		switch err {
 		case smarthome_sdk.ErrConnFailed:
 			fmt.Printf("Failed to fetch debug info: connection to Smarthome (%s) interrupted.\n", Connection.SmarthomeURL.Hostname())
@@ -86,6 +92,7 @@ func StartRepl() {
 		hasFetchedDebug = false
 	}
 	initCompleter()
+	s.Stop()
 	fmt.Printf("Welcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m\n", Version)
 	if hasFetchedDebug {
 		fmt.Printf("Server: v%s:%s on \x1b[35m%s\x1b[0m\n", debugInfo.ServerVersion, debugInfo.GoVersion, Url)

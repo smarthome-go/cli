@@ -14,7 +14,7 @@ import (
 
 func powerStats() {
 	s := spinner.New(spinner.CharSets[11], 150*time.Millisecond)
-	s.Suffix = " Loading power states..."
+	s.Suffix = " Loading power states"
 	s.Start()
 	switches, err := Connection.GetAllSwitches()
 	if err != nil {
@@ -71,7 +71,7 @@ func powerStats() {
 
 func listSwitches() {
 	s := spinner.New(spinner.CharSets[11], 150*time.Millisecond)
-	s.Suffix = " Loading switches..."
+	s.Suffix = " Loading switches"
 	s.Start()
 	switches, err := Connection.GetPersonalSwitches()
 	if err != nil {
@@ -109,7 +109,7 @@ func listSwitches() {
 
 func printDebugInfo() {
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-	s.Suffix = " Loading debug information..."
+	s.Suffix = " Loading debug information"
 	s.Start()
 
 	debugInfo, err := Connection.GetDebugInfo()

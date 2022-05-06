@@ -12,7 +12,7 @@ import (
 	"github.com/smarthome-go/sdk"
 )
 
-const Version = "0.8.1-beta"
+const Version = "2.0.2-beta"
 
 var (
 	Verbose  bool

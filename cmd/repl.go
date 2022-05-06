@@ -10,12 +10,12 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/chzyer/readline"
 
-	"github.com/MikMuellerDev/smarthome_sdk"
+	"github.com/smarthome-go/sdk"
 )
 
 var (
 	History   []string
-	Switches  []smarthome_sdk.Switch
+	Switches  []sdk.Switch
 	completer *readline.PrefixCompleter
 )
 
@@ -84,9 +84,9 @@ func StartRepl() {
 	if err != nil {
 		defer s.Stop()
 		switch err {
-		case smarthome_sdk.ErrConnFailed:
+		case sdk.ErrConnFailed:
 			fmt.Printf("Failed to fetch debug info: connection to Smarthome (%s) interrupted.\n", Connection.SmarthomeURL.Hostname())
-		case smarthome_sdk.ErrPermissionDenied:
+		case sdk.ErrPermissionDenied:
 			fmt.Printf("Your user (%s) does not have the permission to view debug information.\n", Connection.Username)
 		}
 		hasFetchedDebug = false

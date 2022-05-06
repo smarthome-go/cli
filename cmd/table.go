@@ -9,7 +9,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/rodaine/table"
 
-	"github.com/MikMuellerDev/smarthome_sdk"
+	"github.com/smarthome-go/sdk"
 )
 
 func powerStats() {
@@ -19,9 +19,9 @@ func powerStats() {
 	switches, err := Connection.GetAllSwitches()
 	if err != nil {
 		switch err {
-		case smarthome_sdk.ErrConnFailed:
+		case sdk.ErrConnFailed:
 			s.FinalMSG = "Failed to fetch power states: network connection to Smarthome was interrupted.\n"
-		case smarthome_sdk.ErrServiceUnavailable:
+		case sdk.ErrServiceUnavailable:
 			s.FinalMSG = "Failed to fetch power states: Smarthome is currently unavailable.\n"
 		default:
 			s.FinalMSG = fmt.Sprintf("An unexpected error occurred: %s\n", err.Error())
@@ -76,9 +76,9 @@ func listSwitches() {
 	switches, err := Connection.GetPersonalSwitches()
 	if err != nil {
 		switch err {
-		case smarthome_sdk.ErrConnFailed:
+		case sdk.ErrConnFailed:
 			s.FinalMSG = "Failed to fetch switches: network connection to Smarthome was interrupted.\n"
-		case smarthome_sdk.ErrServiceUnavailable:
+		case sdk.ErrServiceUnavailable:
 			s.FinalMSG = "Failed to fetch switches: Smarthome is currently unavailable.\n"
 		default:
 			s.FinalMSG = fmt.Sprintf("An unexpected error occurred: %s\n", err.Error())
@@ -115,11 +115,11 @@ func printDebugInfo() {
 	debugInfo, err := Connection.GetDebugInfo()
 	if err != nil {
 		switch err {
-		case smarthome_sdk.ErrPermissionDenied:
+		case sdk.ErrPermissionDenied:
 			s.FinalMSG = "Debug information is not available for your user: you do not have the permission 'debug' which is required to view this information.\n"
-		case smarthome_sdk.ErrConnFailed:
+		case sdk.ErrConnFailed:
 			s.FinalMSG = "Failed to fetch debug information: network connection to Smarthome was interrupted.\n"
-		case smarthome_sdk.ErrServiceUnavailable:
+		case sdk.ErrServiceUnavailable:
 			s.FinalMSG = "Failed to fetch debug information: Smarthome is currently unavailable.\n"
 		default:
 			s.FinalMSG = fmt.Sprintf("An unexpected error occurred: %s\n", err.Error())

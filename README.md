@@ -17,13 +17,13 @@ A working and set-up Smarthome server instance is required.
 For more information and usage documentation visit:
 
   The Homescript Programming Language:
-  - https://github.com/MikMuellerDev/homescript
+  - https://github.com/smarthome-go/homescript
 
   The CLI Interface For Homescript:
-  - https://github.com/MikMuellerDev/homescript-cli
+  - https://github.com/smarthome-go/cli
 
   The Smarthome Server:
-  - https://github.com/MikMuellerDev/smarthome
+  - https://github.com/smarthome-go/smarthome
 
 Usage:
   homescript [flags]
@@ -52,5 +52,5 @@ Use "homescript [command] --help" for more information about a command.
 
 ## Installation of v2.0.1-beta (for Linux/AMD64)
 ```
-cd /tmp && wget https://github.com/MikMuellerDev/homescript-cli/releases/download/v2.0.1-beta/homescript_linux_amd64.tar.gz && tar -xvf homescript_linux_amd64.tar.gz && sudo mv homescript /usr/bin && rm -rf homescript_linux_amd64.tar.gz
+cd /tmp && wget https://github.com/smarthome-go/cli/releases/download/v2.1.0-beta/homescript_linux_amd64.tar.gz && tar -xvf homescript_linux_amd64.tar.gz && sudo mv homescript /usr/bin && rm -rf homescript_linux_amd64.tar.gz
 ```

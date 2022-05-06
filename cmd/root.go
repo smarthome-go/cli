@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/MikMuellerDev/smarthome_sdk"
+	"github.com/smarthome-go/sdk"
 )
 
 const Version = "0.8.1-beta"
@@ -20,7 +20,7 @@ var (
 	Password string
 	Url      string
 
-	Connection *smarthome_sdk.Connection
+	Connection *sdk.Connection
 )
 
 // Map for the config file
@@ -42,11 +42,11 @@ var (
 			"For more information and usage documentation visit:\n" +
 			"\n" +
 			"  \x1b[1;32mThe Homescript Programming Language:\x1b[1;0m\n" +
-			"  - https://github.com/MikMuellerDev/homescript\n\n" +
+			"  - https://github.com/smarthome-go/homescript\n\n" +
 			"  \x1b[1;33mThe CLI Interface For Homescript:\x1b[1;0m\n" +
-			"  - https://github.com/MikMuellerDev/homescript-cli\n\n" +
+			"  - https://github.com/smarthome-go/cli\n\n" +
 			"  \x1b[1;34mThe Smarthome Server:\x1b[1;0m\n" +
-			"  - https://github.com/MikMuellerDev/smarthome\n",
+			"  - https://github.com/smarthome-go/smarthome\n",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
 		},

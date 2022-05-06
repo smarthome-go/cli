@@ -1,4 +1,4 @@
-module github.com/MikMuellerDev/homescript-cli
+module github.com/smarthome-go/cli
 
 go 1.18
 
@@ -6,6 +6,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/rodaine/table v1.0.1
+	github.com/smarthome-go/sdk v0.5.0
 )
 
 require (
@@ -18,7 +19,6 @@ require (
 )
 
 require (
-	github.com/MikMuellerDev/smarthome_sdk v0.2.0
 	github.com/briandowns/spinner v1.18.1
 	github.com/fatih/color v1.13.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect

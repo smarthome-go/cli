@@ -7,8 +7,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/howeyc/gopass"
-
-	"github.com/MikMuellerDev/smarthome_sdk"
+	"github.com/smarthome-go/sdk"
 )
 
 func InitConn() {
@@ -16,7 +15,7 @@ func InitConn() {
 	s.Prefix = "Connecting to Smarthome "
 	PromptLogin()
 	s.Start()
-	conn, err := smarthome_sdk.NewConnection(Url, smarthome_sdk.AuthMethodCookie)
+	conn, err := sdk.NewConnection(Url, sdk.AuthMethodCookie)
 	if err != nil {
 		s.FinalMSG = fmt.Sprintf("Could not prepare connection via SDK for Smarthome-server (url: '%s'). Error: %s", Url, err.Error())
 		s.Stop()

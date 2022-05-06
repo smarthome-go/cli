@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/MikMuellerDev/homescript-cli/cmd"
+	"github.com/smarthome-go/cli/cmd"
 )
 
 func main() {

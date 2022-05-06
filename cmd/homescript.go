@@ -7,11 +7,11 @@ import (
 
 	"github.com/briandowns/spinner"
 
-	"github.com/MikMuellerDev/smarthome_sdk"
+	"github.com/smarthome-go/sdk"
 )
 
 // Pretty-prints a Homescript error
-func printError(err smarthome_sdk.HomescriptError, program string) {
+func printError(err sdk.HomescriptError, program string) {
 	lines := strings.Split(program, "\n")
 	line1 := ""
 	if err.Location.Line > 1 {
@@ -63,7 +63,7 @@ func RunCode(code string, filename string) int {
 	output, err := Connection.RunHomescript(code, time.Minute*2)
 	ch <- struct{}{}
 	if err != nil {
-		if err == smarthome_sdk.ErrPermissionDenied {
+		if err == sdk.ErrPermissionDenied {
 			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
 			return 403
 		}

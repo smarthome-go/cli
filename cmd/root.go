@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/smarthome-go/cli/cmd/workspace"
 	"github.com/smarthome-go/sdk"
 )
 
@@ -213,6 +214,55 @@ func Execute() {
 	cmdConfigSet.Flags().StringVarP(&setURL, "new-ip", "a", "", "url / ip to be updated")
 	cmdConfig.AddCommand(cmdConfigSet)
 	rootCmd.AddCommand(cmdConfig)
+
+	// Parent ws commands
+	cmdWS := &cobra.Command{
+		Use:   "ws",
+		Short: "workspace",
+		Long:  "Allows the user to create workspaces and develop homescript files",
+		Args:  cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := cmd.Help(); err != nil {
+				panic(err.Error())
+			}
+		},
+	}
+	cmdWSInit := &cobra.Command{
+		Use:   "new [hms-id] [project-name]",
+		Short: "new project",
+		Long:  "Creates a new project and creates a new Homescript on the remote",
+		Args:  cobra.RangeArgs(1, 2),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			if len(args) == 2 {
+				workspace.New(args[0], args[1], Connection)
+			} else {
+				workspace.New(args[0], "", Connection)
+			}
+		},
+	}
+	var purge bool
+	cmdWSRemove := &cobra.Command{
+		Use:   "rm [hms-id]",
+		Short: "removes project",
+		Long:  "Removes project locally and can purge it on the remote if the -P flag is set",
+		Args:  cobra.ExactArgs(1),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+
+			InitConn()
+			workspace.Delete(args[0], purge, Connection)
+		},
+	}
+	cmdWSRemove.Flags().BoolVarP(&purge, "purge", "P", false, "whether the project should be deleted on the remote")
+	cmdWS.AddCommand(cmdWSInit)
+	cmdWS.AddCommand(cmdWSRemove)
+	rootCmd.AddCommand(cmdWS)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())

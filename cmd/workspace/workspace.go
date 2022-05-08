@@ -5,8 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/BurntSushi/toml"
-
+	"github.com/pelletier/go-toml"
 	"github.com/smarthome-go/sdk"
 )
 
@@ -130,7 +129,7 @@ func PushLocal(c *sdk.Connection) {
 		os.Exit(1)
 	}
 	var configToml ConfigToml
-	if _, err := toml.Decode(string(content), &configToml); err != nil {
+	if err := toml.Unmarshal(content, &configToml); err != nil {
 		fmt.Printf("Could not push local state: failed to parse `hms.toml`: %s\n", err.Error())
 		os.Exit(1)
 	}
@@ -174,11 +173,11 @@ func PullLocal(c *sdk.Connection) {
 		os.Exit(1)
 	}
 	var configToml ConfigToml
-	if _, err := toml.Decode(string(content), &configToml); err != nil {
+	if err := toml.Unmarshal(content, &configToml); err != nil {
 		fmt.Printf("Could not pull remote state: failed to parse `hms.toml`: %s\n", err.Error())
 		os.Exit(1)
 	}
-	remote, err := sdk.GetHomesript(configToml.Id)
+	remote, err := c.GetHomescript(configToml.Id)
 	if err != nil {
 		switch err {
 		case sdk.ErrUnprocessableEntity:
@@ -186,8 +185,27 @@ func PullLocal(c *sdk.Connection) {
 		case sdk.ErrPermissionDenied:
 			fmt.Printf("Failed to pull remote state: permission denied: please ensure that you have the correct access rights to pull hms-objects.\n")
 		default:
-			fmt.Printf("Could not pull remote state: server responded with unknown error: ", err.Error())
+			fmt.Printf("Could not pull remote state: server responded with unknown error: %s\n", err.Error())
 		}
+		os.Exit(1)
+	}
+	data, err := toml.Marshal(ConfigToml{
+		Id:                  remote.Id,
+		Name:                remote.Name,
+		Description:         remote.Description,
+		QuickActionsEnabled: remote.QuickActionsEnabled,
+		SchedulerEnabled:    remote.SchedulerEnabled,
+	})
+	if err != nil {
+		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile("hms.toml", data, 0775); err != nil {
+		fmt.Printf("Could not pull remote state: failed to update `hms.toml` config file: %s\n", err.Error())
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile(fmt.Sprintf("%s.hms", configToml.Id), []byte(remote.Code), 0775); err != nil {
+		fmt.Printf("Could not pull remote state: failed to update local `.hms` file: %s\n", err.Error())
 		os.Exit(1)
 	}
 }

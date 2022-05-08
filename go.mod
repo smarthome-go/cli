@@ -3,11 +3,11 @@ module github.com/smarthome-go/cli
 go 1.18
 
 require (
-	github.com/BurntSushi/toml v1.1.0
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
+	github.com/pelletier/go-toml v1.9.5
 	github.com/rodaine/table v1.0.1
-	github.com/smarthome-go/sdk v0.5.0
+	github.com/smarthome-go/sdk v0.6.0
 )
 
 require (

@@ -118,7 +118,7 @@ func removeProjectFiles(id string) error {
 func PushLocal(c *sdk.Connection) {
 	if _, err := os.Stat("hms.toml"); err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println("You can only push state inside a hms-project.")
+			fmt.Println("You can only push local state inside a hms-project.")
 		} else {
 			fmt.Println("Unknown error: ", err.Error())
 		}
@@ -154,6 +154,39 @@ func PushLocal(c *sdk.Connection) {
 			fmt.Printf("Failed to push local project: permission denied: please ensure that you have the correct access rights to push hms-objects.\n")
 		default:
 			fmt.Printf("Failed to push local project: unknown error: %s\n", err.Error())
+		}
+		os.Exit(1)
+	}
+}
+
+func PullLocal(c *sdk.Connection) {
+	if _, err := os.Stat("hms.toml"); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("You can only pull remote state inside a hms-project.")
+		} else {
+			fmt.Println("Unknown error: ", err.Error())
+		}
+		os.Exit(1)
+	}
+	content, err := ioutil.ReadFile("./hms.toml")
+	if err != nil {
+		fmt.Printf("Could not pull remote state: failed to read `hms.toml`: %s\n", err.Error())
+		os.Exit(1)
+	}
+	var configToml ConfigToml
+	if _, err := toml.Decode(string(content), &configToml); err != nil {
+		fmt.Printf("Could not pull remote state: failed to parse `hms.toml`: %s\n", err.Error())
+		os.Exit(1)
+	}
+	remote, err := sdk.GetHomesript(configToml.Id)
+	if err != nil {
+		switch err {
+		case sdk.ErrUnprocessableEntity:
+			fmt.Printf("Could not pull remote state: either the project does not exist on the remote or you don't have the required permission to access it.")
+		case sdk.ErrPermissionDenied:
+			fmt.Printf("Failed to pull remote state: permission denied: please ensure that you have the correct access rights to pull hms-objects.\n")
+		default:
+			fmt.Printf("Could not pull remote state: server responded with unknown error: ", err.Error())
 		}
 		os.Exit(1)
 	}

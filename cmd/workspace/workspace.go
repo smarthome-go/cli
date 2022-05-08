@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -57,7 +58,7 @@ func Delete(id string, purgeOrigin bool, c *sdk.Connection) {
 			case sdk.ErrUnprocessableEntity:
 				fmt.Printf("Failed to remove project: local project (`%s`) does not exist on remote.\n", id)
 			case sdk.ErrPermissionDenied:
-				fmt.Printf("Failed to remove project: permission denied: please ensure that you have the correct access rights to remove new hms-objects.\n")
+				fmt.Printf("Failed to remove project: permission denied: please ensure that you have the correct access rights to remove hms-objects.\n")
 			default:
 				fmt.Printf("Failed to remove project: unknown error: %s\n", err.Error())
 			}
@@ -89,6 +90,13 @@ func createProjectFiles(id string, name string) error {
 	if err := os.Mkdir(id, 0755); err != nil {
 		return err
 	}
+	if err := ioutil.WriteFile(
+		fmt.Sprintf("./%s/%s.hms", id, id),
+		[]byte(fmt.Sprintf("# Write your code for `%s` below", id)),
+		0775,
+	); err != nil {
+		return err
+	}
 	return createProjectConfigFile(id, name, fmt.Sprintf("./%s/hms.toml", id))
 }
 
@@ -105,4 +113,48 @@ func removeProjectFiles(id string) error {
 	}
 	fmt.Printf("Removed project root at ./%s\n", id)
 	return nil
+}
+
+func PushLocal(c *sdk.Connection) {
+	if _, err := os.Stat("hms.toml"); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("You can only push state inside a hms-project.")
+		} else {
+			fmt.Println("Unknown error: ", err.Error())
+		}
+		os.Exit(1)
+	}
+	content, err := ioutil.ReadFile("./hms.toml")
+	if err != nil {
+		fmt.Printf("Could not push local state: failed to read `hms.toml`: %s\n", err.Error())
+		os.Exit(1)
+	}
+	var configToml ConfigToml
+	if _, err := toml.Decode(string(content), &configToml); err != nil {
+		fmt.Printf("Could not push local state: failed to parse `hms.toml`: %s\n", err.Error())
+		os.Exit(1)
+	}
+	hmsContent, err := ioutil.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
+	if err != nil {
+		fmt.Printf("Could not push local state: failed to read homescript file: %s\n", err.Error())
+		os.Exit(1)
+	}
+	if err := c.ModifyHomescript(sdk.HomescriptRequest{
+		Id:                  configToml.Id,
+		Name:                configToml.Name,
+		Description:         configToml.Description,
+		QuickActionsEnabled: configToml.QuickActionsEnabled,
+		SchedulerEnabled:    configToml.SchedulerEnabled,
+		Code:                string(hmsContent),
+	}); err != nil {
+		switch err {
+		case sdk.ErrUnprocessableEntity:
+			fmt.Printf("Failed to push local project state: invalid data provided: %s\n", err.Error())
+		case sdk.ErrPermissionDenied:
+			fmt.Printf("Failed to push local project: permission denied: please ensure that you have the correct access rights to push hms-objects.\n")
+		default:
+			fmt.Printf("Failed to push local project: unknown error: %s\n", err.Error())
+		}
+		os.Exit(1)
+	}
 }

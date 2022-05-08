@@ -244,6 +244,19 @@ func Execute() {
 			}
 		},
 	}
+	cmdWSPush := &cobra.Command{
+		Use:   "push",
+		Short: "push project state",
+		Long:  "Reads local changes and pushes local state to the remote",
+		Args:  cobra.NoArgs,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			workspace.PushLocal(Connection)
+		},
+	}
 	var purge bool
 	cmdWSRemove := &cobra.Command{
 		Use:   "rm [hms-id]",
@@ -261,6 +274,7 @@ func Execute() {
 	}
 	cmdWSRemove.Flags().BoolVarP(&purge, "purge", "P", false, "whether the project should be deleted on the remote")
 	cmdWS.AddCommand(cmdWSInit)
+	cmdWS.AddCommand(cmdWSPush)
 	cmdWS.AddCommand(cmdWSRemove)
 	rootCmd.AddCommand(cmdWS)
 

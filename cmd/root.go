@@ -257,6 +257,55 @@ func Execute() {
 			workspace.PushLocal(Connection)
 		},
 	}
+	cmdWSPull := &cobra.Command{
+		Use:   "pull",
+		Short: "pull project state",
+		Long:  "Fetches remote changes and writes them to the local project",
+		Args:  cobra.NoArgs,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			workspace.PullLocal(Connection)
+		},
+	}
+	var localOnly = false
+	cmdWsRun := &cobra.Command{
+		Use:   "run",
+		Short: "Run local homescript project",
+		Long:  "Executes the local state of the homescript file on the server",
+		Args:  cobra.NoArgs,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			startTime := time.Now()
+			InitConn()
+			content, config := workspace.ReadLocalData(Connection)
+
+			var exitCode int
+			if localOnly {
+				if Verbose {
+					fmt.Printf("Executing `%s.hms` on using local state", config.Id)
+				}
+				exitCode = RunCode(string(content), fmt.Sprintf("%s.hms", config.Id))
+			} else {
+				if Verbose {
+					fmt.Printf("Executing `%s.hms` on using remote state", config.Id)
+				}
+				exitCode = RunCode(fmt.Sprintf("print(exec('%s'))", config.Id), fmt.Sprintf("%s.hms", config.Id))
+			}
+			if exitCode != 0 {
+				fmt.Printf("Homescript terminated with exit code: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
+			} else {
+				fmt.Printf("Homescript was executed successfully: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
+			}
+			os.Exit(exitCode)
+		},
+	}
+	cmdWsRun.Flags().BoolVarP(&localOnly, "local", "l", false, "whether the file should be executed using the local state instead of the remote state")
+
 	var purge bool
 	cmdWSRemove := &cobra.Command{
 		Use:   "rm [hms-id]",
@@ -275,6 +324,8 @@ func Execute() {
 	cmdWSRemove.Flags().BoolVarP(&purge, "purge", "P", false, "whether the project should be deleted on the remote")
 	cmdWS.AddCommand(cmdWSInit)
 	cmdWS.AddCommand(cmdWSPush)
+	cmdWS.AddCommand(cmdWSPull)
+	cmdWS.AddCommand(cmdWsRun)
 	cmdWS.AddCommand(cmdWSRemove)
 	rootCmd.AddCommand(cmdWS)
 

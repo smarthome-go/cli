@@ -7,6 +7,7 @@ import (
 
 	"github.com/pelletier/go-toml"
 	"github.com/sergi/go-diff/diffmatchpatch"
+
 	"github.com/smarthome-go/sdk"
 )
 
@@ -76,6 +77,9 @@ func createProjectConfigFile(id string, name string, path string) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
+	}
+	if name == "" {
+		name = id
 	}
 	if err := toml.NewEncoder(file).Encode(ConfigToml{
 		Id:   id,

@@ -17,6 +17,7 @@ type ConfigToml struct {
 	Description         string `toml:"description"`
 	QuickActionsEnabled bool   `toml:"quickActions"`
 	SchedulerEnabled    bool   `toml:"scheduler"`
+	MDIcon              string `toml:"icon"`
 }
 
 // Creates a new project on the remote and locally
@@ -82,8 +83,9 @@ func createProjectConfigFile(id string, name string, path string) error {
 		name = id
 	}
 	if err := toml.NewEncoder(file).Encode(ConfigToml{
-		Id:   id,
-		Name: name,
+		Id:     id,
+		Name:   name,
+		MDIcon: "code",
 	}); err != nil {
 		return err
 	}
@@ -171,6 +173,7 @@ func PushLocal(c *sdk.Connection) {
 		QuickActionsEnabled: configToml.QuickActionsEnabled,
 		SchedulerEnabled:    configToml.SchedulerEnabled,
 		Code:                string(hmsContent),
+		MDIcon:              configToml.MDIcon,
 	}); err != nil {
 		switch err {
 		case sdk.ErrUnprocessableEntity:
@@ -201,6 +204,7 @@ func PushLocal(c *sdk.Connection) {
 		Description:         remoteBef.Description,
 		QuickActionsEnabled: remoteBef.QuickActionsEnabled,
 		SchedulerEnabled:    remoteBef.SchedulerEnabled,
+		MDIcon:              remoteBef.MDIcon,
 	}
 	// Display general Diff info
 	if tomlBef != configToml {
@@ -254,6 +258,7 @@ func PullLocal(c *sdk.Connection) {
 		Description:         remote.Description,
 		QuickActionsEnabled: remote.QuickActionsEnabled,
 		SchedulerEnabled:    remote.SchedulerEnabled,
+		MDIcon:              configToml.MDIcon,
 	})
 	if err != nil {
 		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
@@ -286,6 +291,7 @@ func PullLocal(c *sdk.Connection) {
 		Description:         remote.Description,
 		QuickActionsEnabled: remote.QuickActionsEnabled,
 		SchedulerEnabled:    remote.SchedulerEnabled,
+		MDIcon:              configToml.MDIcon,
 	}
 	// Display general Diff info
 	if tomlBef != configToml {

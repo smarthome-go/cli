@@ -7,7 +7,7 @@ require (
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/pelletier/go-toml v1.9.5
 	github.com/rodaine/table v1.0.1
-	github.com/smarthome-go/sdk v0.6.0
+	github.com/smarthome-go/sdk v0.7.0
 )
 
 require (

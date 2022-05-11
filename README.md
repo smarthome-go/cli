@@ -4,15 +4,14 @@
 Homescript-cli's original purpose is to represent a powerful command-line-interface for the Smarthome server.
 Sample output of a *REPL* session can be found below
 ```
-mik@mik-pc ~/g/s/g/M/smarthome (main) » homescript -i "http://cloud.box:8123" -u admin -p admin
-Server: v0.0.15-beta:go1.18 on http://cloud.box:8123
-Welcome to Homescript interactive v0.4.0-beta. CLI commands and comments start with #
-admin@homescript> switch('s2', off) 
+Welcome to Homescript interactive v2.2.0-beta. CLI commands and comments start with #
+Server: v0.0.26:go1.18.1 on http://cloud.box:8123
+admin@homescript> 
 ```
 
 ## Help Output
 ```
-homescript-cli v2.0.0-beta-rc.1 : A command line interface for the smarthome server using homescript
+homescript-cli v2.2.0-beta : A command line interface for the smarthome server using homescript
 A working and set-up Smarthome server instance is required.
 For more information and usage documentation visit:
 
@@ -38,6 +37,7 @@ Available Commands:
   power       Power Summary
   run         Run a homescript file
   switches    List switches
+  ws          workspace
 
 Flags:
   -h, --help              help for homescript

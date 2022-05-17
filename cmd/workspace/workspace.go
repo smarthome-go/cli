@@ -406,6 +406,7 @@ func Clone(c *sdk.Connection, id string) {
 }
 
 func CloneAll(c *sdk.Connection) {
+	fmt.Printf("Cloning all available Homescripts from `%s`...\n\n", c.SmarthomeURL.Host)
 	start := time.Now()
 	scripts, err := c.ListHomescript()
 	if err != nil {
@@ -413,13 +414,17 @@ func CloneAll(c *sdk.Connection) {
 		os.Exit(1)
 	}
 	scriptCount := len(scripts)
-	for index, script := range scripts {
+	for _, script := range scripts {
 		Clone(c, script.Data.Id)
-		if index < scriptCount-1 {
-			fmt.Println()
-		}
+		fmt.Println()
 	}
+
+	projectSIndicator := "s"
+	if scriptCount == 1 {
+		projectSIndicator = ""
+	}
+
 	if scriptCount > 0 {
-		fmt.Printf("Cloned %d projects in %v\n", scriptCount, time.Since(start))
+		fmt.Printf("Finished: cloned %d project%s in %.2fs.\n", scriptCount, projectSIndicator, time.Since(start).Seconds())
 	}
 }

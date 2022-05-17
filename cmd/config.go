@@ -37,7 +37,7 @@ func readConfigFile() {
 		os.Exit(1)
 	}
 	if err := yaml.Unmarshal(fileContent, &Config); err != nil {
-		fmt.Println(fmt.Sprintf("Failed to parse config file at %s: invalid YAML format: %s", configFilePath, err.Error()))
+		fmt.Printf("Failed to parse config file at %s: invalid YAML format: %s\n", configFilePath, err.Error())
 		os.Exit(1)
 	}
 	if Username == "" && Config["Username"] != "" {

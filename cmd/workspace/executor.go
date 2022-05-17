@@ -80,7 +80,7 @@ func (self *Executor) Log(
 	description string,
 	level interpreter.LogLevel,
 ) error {
-	if level < 0 || level > 5 {
+	if level > 5 {
 		return fmt.Errorf("Failed to add log event: invalid logging level <%d>: valid logging levels are 1, 2, 3, 4, or 5", level)
 	}
 	return nil

@@ -257,6 +257,19 @@ func Execute() {
 			workspace.PushLocal(Connection)
 		},
 	}
+	cmdWSL := &cobra.Command{
+		Use:   "ls",
+		Short: "List remote projects",
+		Long:  "Displays a list of available remote projects to clone.",
+		Args:  cobra.NoArgs,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			workspace.ListAll(Connection)
+		},
+	}
 	cmdWSPull := &cobra.Command{
 		Use:   "pull",
 		Short: "pull project state",
@@ -309,8 +322,8 @@ func Execute() {
 	var purge bool
 	cmdWSRemove := &cobra.Command{
 		Use:   "rm [hms-id]",
-		Short: "removes project",
-		Long:  "Removes project locally and can purge it on the remote if the -P flag is set",
+		Short: "removes a project",
+		Long:  "Removes project locally and can purge it on the remote if the -P flag is set.",
 		Args:  cobra.ExactArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
@@ -321,12 +334,41 @@ func Execute() {
 			workspace.Delete(args[0], purge, Connection)
 		},
 	}
+	var all bool
+	cmdWSClone := &cobra.Command{
+		Use:   "clone [hms-id]",
+		Short: "clones a project",
+		Long:  "Downloads a remote project into a folder named equally to the ID. Sets it up for local development.",
+		Args:  cobra.RangeArgs(0, 1),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			if !all {
+				if len(args) == 0 {
+					fmt.Sprintln("Error: accepts 1 arg(s), received 0")
+					if err := cmd.Help(); err != nil {
+						panic(err.Error())
+					}
+				}
+				workspace.Clone(Connection, args[0])
+				os.Exit(0)
+			} else {
+				workspace.CloneAll(Connection)
+				os.Exit(0)
+			}
+		},
+	}
+	cmdWSClone.Flags().BoolVarP(&all, "all", "a", false, "")
 	cmdWSRemove.Flags().BoolVarP(&purge, "purge", "P", false, "whether the project should be deleted on the remote")
 	cmdWS.AddCommand(cmdWSInit)
 	cmdWS.AddCommand(cmdWSPush)
 	cmdWS.AddCommand(cmdWSPull)
+	cmdWS.AddCommand(cmdWSL)
 	cmdWS.AddCommand(cmdWsRun)
 	cmdWS.AddCommand(cmdWSRemove)
+	cmdWS.AddCommand(cmdWSClone)
 	rootCmd.AddCommand(cmdWS)
 
 	if err := rootCmd.Execute(); err != nil {

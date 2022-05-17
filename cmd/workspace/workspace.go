@@ -1,11 +1,15 @@
 package workspace
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
+	"github.com/fatih/color"
 	"github.com/pelletier/go-toml"
+	"github.com/rodaine/table"
 	"github.com/sergi/go-diff/diffmatchpatch"
 
 	"github.com/smarthome-go/sdk"
@@ -187,7 +191,7 @@ func PushLocal(c *sdk.Connection) {
 	}
 	// Display diff after successful change
 	dmp := diffmatchpatch.New()
-	diffs := dmp.DiffMain(remoteBef.Code, string(hmsContent), false)
+	diffs := dmp.DiffMain(remoteBef.Data.Code, string(hmsContent), false)
 	noChange := true
 	for _, d := range diffs {
 		if d.Type != diffmatchpatch.DiffEqual {
@@ -199,12 +203,12 @@ func PushLocal(c *sdk.Connection) {
 	}
 	// Display `hms.toml` changes via diff
 	tomlBef := ConfigToml{
-		Id:                  remoteBef.Id,
-		Name:                remoteBef.Name,
-		Description:         remoteBef.Description,
-		QuickActionsEnabled: remoteBef.QuickActionsEnabled,
-		SchedulerEnabled:    remoteBef.SchedulerEnabled,
-		MDIcon:              remoteBef.MDIcon,
+		Id:                  remoteBef.Data.Id,
+		Name:                remoteBef.Data.Name,
+		Description:         remoteBef.Data.Description,
+		QuickActionsEnabled: remoteBef.Data.QuickActionsEnabled,
+		SchedulerEnabled:    remoteBef.Data.SchedulerEnabled,
+		MDIcon:              remoteBef.Data.MDIcon,
 	}
 	// Display general Diff info
 	if tomlBef != configToml {
@@ -253,11 +257,11 @@ func PullLocal(c *sdk.Connection) {
 		os.Exit(1)
 	}
 	data, err := toml.Marshal(ConfigToml{
-		Id:                  remote.Id,
-		Name:                remote.Name,
-		Description:         remote.Description,
-		QuickActionsEnabled: remote.QuickActionsEnabled,
-		SchedulerEnabled:    remote.SchedulerEnabled,
+		Id:                  remote.Data.Id,
+		Name:                remote.Data.Name,
+		Description:         remote.Data.Description,
+		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
+		SchedulerEnabled:    remote.Data.SchedulerEnabled,
 		MDIcon:              configToml.MDIcon,
 	})
 	if err != nil {
@@ -268,13 +272,13 @@ func PullLocal(c *sdk.Connection) {
 		fmt.Printf("Could not pull remote state: failed to update `hms.toml` config file: %s\n", err.Error())
 		os.Exit(1)
 	}
-	if err := ioutil.WriteFile(fmt.Sprintf("%s.hms", configToml.Id), []byte(remote.Code), 0775); err != nil {
+	if err := ioutil.WriteFile(fmt.Sprintf("%s.hms", configToml.Id), []byte(remote.Data.Code), 0775); err != nil {
 		fmt.Printf("Could not pull remote state: failed to update local `.hms` file: %s\n", err.Error())
 		os.Exit(1)
 	}
 	// Display diff after successful change
 	dmp := diffmatchpatch.New()
-	diffs := dmp.DiffMain(string(hmsContent), remote.Code, false)
+	diffs := dmp.DiffMain(string(hmsContent), remote.Data.Code, false)
 	noChange := true
 	for _, d := range diffs {
 		if d.Type != diffmatchpatch.DiffEqual {
@@ -286,11 +290,11 @@ func PullLocal(c *sdk.Connection) {
 	}
 	// Display `hms.toml` changes via diff
 	tomlBef := ConfigToml{
-		Id:                  remote.Id,
-		Name:                remote.Name,
-		Description:         remote.Description,
-		QuickActionsEnabled: remote.QuickActionsEnabled,
-		SchedulerEnabled:    remote.SchedulerEnabled,
+		Id:                  remote.Data.Id,
+		Name:                remote.Data.Name,
+		Description:         remote.Data.Description,
+		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
+		SchedulerEnabled:    remote.Data.SchedulerEnabled,
 		MDIcon:              configToml.MDIcon,
 	}
 	// Display general Diff info
@@ -301,6 +305,7 @@ func PullLocal(c *sdk.Connection) {
 	}
 }
 
+// Reads the `hms.toml` file in the current project and returns a struct
 func ReadLocalData(c *sdk.Connection) (string, ConfigToml) {
 	content, err := ioutil.ReadFile("./hms.toml")
 	if err != nil {
@@ -318,4 +323,103 @@ func ReadLocalData(c *sdk.Connection) (string, ConfigToml) {
 		os.Exit(1)
 	}
 	return string(hmsContent), configToml
+}
+
+// Displays a list of cloneable Homescripts of the current user
+func ListAll(c *sdk.Connection) {
+	scripts, err := c.ListHomescript()
+	if err != nil {
+		fmt.Printf("Could not list all homescripts: failed to load data from server: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+	tbl := table.New("ID", "Name", "MDIcon", "QuickActions", "Scheduler")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+	// Fill the table
+	for _, script := range scripts {
+		quickActionsIndicator, schedulerIndicator := "no", "no"
+		if script.Data.QuickActionsEnabled {
+			quickActionsIndicator = "yes"
+		}
+		if script.Data.SchedulerEnabled {
+			schedulerIndicator = "yes"
+		}
+
+		tbl.AddRow(script.Data.Id, script.Data.Name, script.Data.MDIcon, quickActionsIndicator, schedulerIndicator)
+	}
+	tbl.Print()
+}
+
+func Clone(c *sdk.Connection, id string) {
+	fmt.Printf("Cloning into `%s`...\nResolving remote project...\n", id)
+	remote, err := c.GetHomescript(id)
+	if err != nil {
+		switch err {
+		case sdk.ErrPermissionDenied:
+			fmt.Printf("Error: Could not clone `%s`: you lack permission to access Homescript.\n", id)
+		case sdk.ErrReadResponseBody:
+			fmt.Printf("Error: Could not clone `%s`: server returned invalid response: %s.\n", id, err.Error())
+		case sdk.ErrUnprocessableEntity:
+			fmt.Printf("Error: Could not read from remote: Project `%s` not found.\nPlease ensure that you have the correct access rights and the project exists.\n", id)
+		default:
+			fmt.Printf("Fatal: Failed to clone `%s`: unknown error: %s", id, err.Error())
+		}
+		os.Exit(1)
+	}
+	json, err := json.Marshal(remote)
+	if err != nil {
+		fmt.Printf("Cannot display size of project: %s\n", err.Error())
+	}
+	fmt.Printf("Downloaded remote project (size: %dB).\n", len(json))
+	if err := os.Mkdir(id, 0755); err != nil {
+		if os.IsExist(err) {
+			fmt.Printf("Error: Could not clone into `./%s`.\nFailed to initialize project root: specified directory already exists.\n", id)
+		} else {
+			fmt.Printf("Error: Could not clone into `./%s`.\nFailed to initialize project root: %s\n", id, err.Error())
+		}
+		os.Exit(1)
+	}
+	data, err := toml.Marshal(ConfigToml{
+		Id:                  id,
+		Name:                remote.Data.Name,
+		Description:         remote.Data.Description,
+		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
+		SchedulerEnabled:    remote.Data.SchedulerEnabled,
+		MDIcon:              remote.Data.MDIcon,
+	})
+	if err != nil {
+		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile(fmt.Sprintf("./%s/hms.toml", id), data, 0775); err != nil {
+		fmt.Printf("Could not pull remote state: failed to update `hms.toml` config file: %s\n", err.Error())
+		os.Exit(1)
+	}
+	if err := ioutil.WriteFile(fmt.Sprintf("./%s/%s.hms", id, id), []byte(remote.Data.Code), 0775); err != nil {
+		fmt.Printf("Could not pull remote state: failed to update local `.hms` file: %s\n", err.Error())
+		os.Exit(1)
+	}
+}
+
+func CloneAll(c *sdk.Connection) {
+	start := time.Now()
+	scripts, err := c.ListHomescript()
+	if err != nil {
+		fmt.Printf("Could not clone all homescripts: failed to load list from server: %s\n", err.Error())
+		os.Exit(1)
+	}
+	scriptCount := len(scripts)
+	for index, script := range scripts {
+		Clone(c, script.Data.Id)
+		if index < scriptCount-1 {
+			fmt.Println()
+		}
+	}
+	if scriptCount > 0 {
+		fmt.Printf("Cloned %d projects in %v\n", scriptCount, time.Since(start))
+	}
 }

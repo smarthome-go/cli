@@ -1,7 +1,7 @@
-# homescript-cli
+# Smarthome-cli
 
 ## REPL
-Homescript-cli's original purpose is to represent a powerful command-line-interface for the Smarthome server.
+Smarthome-cli's (formerly Homescript-cli) original purpose is to represent a powerful command-line-interface for the Smarthome server.
 Sample output of a *REPL* session can be found below
 ```
 Welcome to Homescript interactive v2.2.0-beta. CLI commands and comments start with #

@@ -2,7 +2,7 @@ module github.com/smarthome-go/cli
 
 go 1.18
 
-require github.com/smarthome-go/sdk v0.8.0
+require github.com/smarthome-go/sdk v0.8.1
 
 require (
 	github.com/briandowns/spinner v1.18.1

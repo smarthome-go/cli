@@ -46,6 +46,8 @@ github.com/smarthome-go/homescript v0.6.1-beta h1:NLpOwM6hfQ0uG0BFsXcgV9UHD74FE+
 github.com/smarthome-go/homescript v0.6.1-beta/go.mod h1:QiwJH1vn6X8FG2lI+N4HkkE5La6zTYojV2U6tSoUaZ0=
 github.com/smarthome-go/sdk v0.8.0 h1:1cHem9JDgxlIxvtY5BcSRjcC9ehwxlpsBLb98GwnjtE=
 github.com/smarthome-go/sdk v0.8.0/go.mod h1:kfYJNsB0dR1HgD4SU7P/D2tSAB2Jntcq1cgLpjEaknQ=
+github.com/smarthome-go/sdk v0.8.1 h1:5VIa8JdnFG0fx1iGOnrJ4aGMzedirIfYTH0m/oBHdCw=
+github.com/smarthome-go/sdk v0.8.1/go.mod h1:kfYJNsB0dR1HgD4SU7P/D2tSAB2Jntcq1cgLpjEaknQ=
 github.com/spf13/cobra v1.4.0 h1:y+wJpx64xcgO1V+RcnwW0LEHxTKRi2ZDPSBjWnrg88Q=
 github.com/spf13/cobra v1.4.0/go.mod h1:Wo4iy3BUC+X2Fybo0PDqwJIv3dNRiZLHQymsfxlB84g=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=

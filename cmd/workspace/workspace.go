@@ -366,7 +366,7 @@ func Clone(c *sdk.Connection, id string) {
 		case sdk.ErrUnprocessableEntity:
 			fmt.Printf("Error: Could not read from remote: Project `%s` not found.\nPlease ensure that you have the correct access rights and the project exists.\n", id)
 		default:
-			fmt.Printf("Fatal: Failed to clone `%s`: unknown error: %s", id, err.Error())
+			fmt.Printf("Fatal: Failed to clone `%s`: unknown error: %s\n", id, err.Error())
 		}
 		os.Exit(1)
 	}

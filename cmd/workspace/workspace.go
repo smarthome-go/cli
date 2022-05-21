@@ -68,6 +68,8 @@ func Delete(id string, purgeOrigin bool, c *sdk.Connection) {
 				fmt.Printf("Failed to remove project: local project (`%s`) does not exist on remote.\n", id)
 			case sdk.ErrPermissionDenied:
 				fmt.Printf("Failed to remove project: permission denied: please ensure that you have the correct access rights to remove hms-objects.\n")
+			case sdk.ErrConflict:
+				fmt.Printf("Failed to remove project: safety prevention: one or more automations depend on this homescript.\n")
 			default:
 				fmt.Printf("Failed to remove project: unknown error: %s\n", err.Error())
 			}

@@ -163,7 +163,7 @@ func PushLocal(c *sdk.Connection) {
 	if err != nil {
 		switch err {
 		case sdk.ErrUnprocessableEntity:
-			fmt.Printf("Could not pull remote state: either the project does not exist on the remote or you don't have the required permission to access it.")
+			fmt.Printf("Could not pull remote state: either the project does not exist on the remote or you don't have the required permission to access it.\n")
 		case sdk.ErrPermissionDenied:
 			fmt.Printf("Failed to pull remote state: permission denied: please ensure that you have the correct access rights to pull hms-objects.\n")
 		default:
@@ -250,7 +250,7 @@ func PullLocal(c *sdk.Connection) {
 	if err != nil {
 		switch err {
 		case sdk.ErrUnprocessableEntity:
-			fmt.Printf("Could not pull remote state: either the project does not exist on the remote or you don't have the required permission to access it.")
+			fmt.Printf("Could not pull remote state: either the project does not exist on the remote or you don't have the required permission to access it.\n")
 		case sdk.ErrPermissionDenied:
 			fmt.Printf("Failed to pull remote state: permission denied: please ensure that you have the correct access rights to pull hms-objects.\n")
 		default:

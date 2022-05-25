@@ -283,7 +283,7 @@ func Execute() {
 			workspace.PullLocal(Connection)
 		},
 	}
-	var localOnly = false
+	var runOnlyLocal = false
 	cmdWsRun := &cobra.Command{
 		Use:   "run",
 		Short: "Run local homescript project",
@@ -295,17 +295,20 @@ func Execute() {
 		Run: func(cmd *cobra.Command, args []string) {
 			startTime := time.Now()
 			InitConn()
-			content, config := workspace.ReadLocalData(Connection)
-
+			content, config, err := workspace.ReadLocalData(Connection)
+			if err != nil {
+				fmt.Printf("Error: %s\n", err.Error())
+				os.Exit(1)
+			}
 			var exitCode int
-			if localOnly {
+			if runOnlyLocal {
 				if Verbose {
-					fmt.Printf("Executing `%s.hms` on using local state", config.Id)
+					fmt.Printf("Executing `%s.hms` using local state", config.Id)
 				}
 				exitCode = RunCode(string(content), fmt.Sprintf("%s.hms", config.Id))
 			} else {
 				if Verbose {
-					fmt.Printf("Executing `%s.hms` on using remote state", config.Id)
+					fmt.Printf("Executing `%s.hms` using remote state", config.Id)
 				}
 				exitCode = RunCode(fmt.Sprintf("print(exec('%s'))", config.Id), fmt.Sprintf("%s.hms", config.Id))
 			}
@@ -317,7 +320,42 @@ func Execute() {
 			os.Exit(exitCode)
 		},
 	}
-	cmdWsRun.Flags().BoolVarP(&localOnly, "local", "l", false, "whether the file should be executed using the local state instead of the remote state")
+	cmdWsRun.Flags().BoolVarP(&runOnlyLocal, "local", "l", false, "whether the file should be executed using the local state instead of the remote state")
+
+	var lintOnRemote = false
+	cmdWsLint := &cobra.Command{
+		Use:   "lint",
+		Short: "Lint local homescript project",
+		Long:  "Executes the script as dry-run in order to lint for errors",
+		Args:  cobra.NoArgs,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			InitConn()
+			content, config, err := workspace.ReadLocalData(Connection)
+			if err != nil {
+				fmt.Printf("Error: %s\n", err.Error())
+				os.Exit(1)
+			}
+
+			var exitCode int
+			if lintOnRemote {
+				if Verbose {
+					fmt.Printf("Linting`%s.hms` using current remote state", config.Id)
+				}
+				exitCode = LintCode(fmt.Sprintf("print(exec('%s'))", config.Id), fmt.Sprintf("%s.hms", config.Id))
+				// TODO: use future by-id implementation of lint
+			} else {
+				if Verbose {
+					fmt.Printf("Linting `%s.hms` using local state", config.Id)
+				}
+				exitCode = LintCode(string(content), fmt.Sprintf("%s.hms", config.Id))
+			}
+			os.Exit(exitCode)
+		},
+	}
+	cmdWsLint.Flags().BoolVarP(&lintOnRemote, "remote", "r", false, "whether the file should be linted using the remote state instead of the local state")
 
 	var purge bool
 	cmdWSRemove := &cobra.Command{
@@ -367,6 +405,7 @@ func Execute() {
 	cmdWS.AddCommand(cmdWSPull)
 	cmdWS.AddCommand(cmdWSL)
 	cmdWS.AddCommand(cmdWsRun)
+	cmdWS.AddCommand(cmdWsLint)
 	cmdWS.AddCommand(cmdWSRemove)
 	cmdWS.AddCommand(cmdWSClone)
 	rootCmd.AddCommand(cmdWS)

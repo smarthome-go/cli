@@ -308,23 +308,23 @@ func PullLocal(c *sdk.Connection) {
 }
 
 // Reads the `hms.toml` file in the current project and returns a struct
-func ReadLocalData(c *sdk.Connection) (string, ConfigToml) {
+func ReadLocalData(c *sdk.Connection) (string, ConfigToml, error) {
 	content, err := ioutil.ReadFile("./hms.toml")
 	if err != nil {
-		fmt.Printf("Could not run local file: failed to read `hms.toml`: %s\n", err.Error())
-		os.Exit(1)
+		fmt.Println("Failed to read `hms.toml`: Are you inside a Homescript project?")
+		return "", ConfigToml{}, err
 	}
 	var configToml ConfigToml
 	if err := toml.Unmarshal(content, &configToml); err != nil {
-		fmt.Printf("Could not run local file: failed to parse `hms.toml`: %s\n", err.Error())
-		os.Exit(1)
+		fmt.Println("Failed to parse `hms.toml`")
+		return "", ConfigToml{}, err
 	}
 	hmsContent, err := ioutil.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
 	if err != nil {
-		fmt.Printf("Could not run local file: failed to read homescript file: %s\n", err.Error())
-		os.Exit(1)
+		fmt.Println("Failed to read homescript file")
+		return "", ConfigToml{}, err
 	}
-	return string(hmsContent), configToml
+	return string(hmsContent), configToml, nil
 }
 
 // Displays a list of cloneable Homescripts of the current user

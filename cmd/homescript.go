@@ -83,3 +83,30 @@ func RunCode(code string, filename string) int {
 	}
 	return output.Exitcode
 }
+
+// Lints an arbitrary string of Homescript code
+// Error handling is done internally and printed directly
+func LintCode(code string, filename string) int {
+	output, err := Connection.LintHomescript(code, time.Minute*2)
+	if err != nil {
+		if err == sdk.ErrPermissionDenied {
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
+			return 403
+		}
+		fmt.Println(err.Error())
+		return 99
+	}
+	if !output.Success || output.Exitcode != 0 {
+		fmt.Printf("FAIL: linting discovered problems in '%s':\n", filename)
+		for _, errorItem := range output.Errors {
+			errorItem.Location.Filename = filename
+			printError(errorItem, code)
+		}
+		return output.Exitcode
+	}
+	if output.Output != "" {
+		fmt.Printf("\x1b[90m%s\x1b[0m\n", output.Output)
+	}
+	fmt.Printf("PASS: linting discovered no problems in '%s'\n", filename)
+	return output.Exitcode
+}

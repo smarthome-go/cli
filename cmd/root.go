@@ -75,7 +75,7 @@ func Execute() {
 				fmt.Printf("Could not execute Homescript file '%s' due to fs error: %s", args[1], err.Error())
 				os.Exit(1)
 			}
-			exitCode := RunCode(string(content), args[0])
+			exitCode := RunCode(string(content), make(map[string]string, 0), args[0])
 			if exitCode != 0 {
 				fmt.Printf("Homescript terminated with exit code: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
 			} else {
@@ -107,7 +107,7 @@ func Execute() {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			InitConn()
-			RunCode(strings.Join(args, "\n"), "stdin")
+			RunCode(strings.Join(args, "\n"), make(map[string]string, 0), "stdin")
 		},
 	}
 	cmdListSwitches := &cobra.Command{
@@ -305,12 +305,12 @@ func Execute() {
 				if Verbose {
 					fmt.Printf("Executing `%s.hms` using local state", config.Id)
 				}
-				exitCode = RunCode(string(content), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = RunCode(string(content), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
 			} else {
 				if Verbose {
 					fmt.Printf("Executing `%s.hms` using remote state", config.Id)
 				}
-				exitCode = RunCode(fmt.Sprintf("print(exec('%s'))", config.Id), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = RunCode(fmt.Sprintf("print(exec('%s'))", config.Id), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
 			}
 			if exitCode != 0 {
 				fmt.Printf("Homescript terminated with exit code: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
@@ -344,13 +344,13 @@ func Execute() {
 				if Verbose {
 					fmt.Printf("Linting`%s.hms` using current remote state", config.Id)
 				}
-				exitCode = LintCode(fmt.Sprintf("print(exec('%s'))", config.Id), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = LintCode(fmt.Sprintf("print(exec('%s'))", config.Id), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
 				// TODO: use future by-id implementation of lint
 			} else {
 				if Verbose {
 					fmt.Printf("Linting `%s.hms` using local state", config.Id)
 				}
-				exitCode = LintCode(string(content), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = LintCode(string(content), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
 			}
 			os.Exit(exitCode)
 		},

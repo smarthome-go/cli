@@ -41,7 +41,7 @@ func printError(err sdk.HomescriptError, program string) {
 
 // Executes an arbitrary string of Homescript code
 // Error handling is done internally and printed directly
-func RunCode(code string, filename string) int {
+func RunCode(code string, args map[string]string, filename string) int {
 	s := spinner.New([]string{"⠏", "⠛", "⠹", "⢸", "⣰", "⣤", "⣆", "⡇"}, 100*time.Millisecond)
 	s.Prefix = "Executing Homescript "
 	s.FinalMSG = ""
@@ -60,7 +60,7 @@ func RunCode(code string, filename string) int {
 			}
 		}
 	}(&ch)
-	output, err := Connection.RunHomescript(code, time.Minute*2)
+	output, err := Connection.RunHomescriptCode(code, args, time.Minute*2)
 	ch <- struct{}{}
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
@@ -86,8 +86,8 @@ func RunCode(code string, filename string) int {
 
 // Lints an arbitrary string of Homescript code
 // Error handling is done internally and printed directly
-func LintCode(code string, filename string) int {
-	output, err := Connection.LintHomescript(code, time.Minute*2)
+func LintCode(code string, args map[string]string, filename string) int {
+	output, err := Connection.LintHomescriptCode(code, args, time.Minute*2)
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
 			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)

@@ -1,6 +1,7 @@
 appname := homescript
 workingdir := "homescript-cli"
 sources := $(wildcard *.go)
+version := 2.5.0-beta
 
 build = CGO_ENABLED=0 GOOS=$(1) GOARCH=$(2) go build -ldflags "-s -w" -o $(appname)$(3) $(4)
 tar = mkdir -p build && tar -cvzf ./$(appname)_$(1)_$(2).tar.gz $(appname)$(3) && mv $(appname)_$(1)_$(2).tar.gz build
@@ -9,6 +10,9 @@ tar = mkdir -p build && tar -cvzf ./$(appname)_$(1)_$(2).tar.gz $(appname)$(3) &
 clean:
 	rm -rf bin
 	rm -rf build
+
+# Github release
+gh release create v$(version) ./build/*.tar.gz -F ./CHANGELOG.md -t 'CLI v$(version)'  --prerelease
 
 # Builds
 build: clean linux

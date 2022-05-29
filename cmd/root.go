@@ -60,22 +60,31 @@ var (
 
 func Execute() {
 	cmdRun := &cobra.Command{
-		Use:   "run [filename]",
-		Short: "Run a homescript file",
-		Long:  "Runs a homescript file and connects to the server",
-		Args:  cobra.ExactArgs(1),
+		Use:   "run [filename] [key:value]",
+		Short: "Run a Homescript file",
+		Long:  "Runs a local Homescript file with arguments on the Smarthome server",
+		Args:  cobra.MinimumNArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			startTime := time.Now()
-			InitConn()
+			// Read file
 			content, err := ioutil.ReadFile(args[0])
 			if err != nil {
-				fmt.Printf("Could not execute Homescript file '%s' due to fs error: %s", args[1], err.Error())
+				fmt.Printf("Could not execute Homescript file '%s' due to fs error: %s\n", args[0], err.Error())
 				os.Exit(1)
 			}
-			exitCode := RunCode(string(content), make(map[string]string, 0), args[0])
+			// Prepare Homescript arguments
+			hmsArgs, err := processHmsArgs(args[1:])
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+			// Initialize Smarthome connection
+			InitConn()
+			// Execute code
+			exitCode := RunCode(string(content), hmsArgs, args[0])
 			if exitCode != 0 {
 				fmt.Printf("Homescript terminated with exit code: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
 			} else {
@@ -86,8 +95,8 @@ func Execute() {
 	}
 	cmdInfo := &cobra.Command{
 		Use:   "debug",
-		Short: "Smarthome Server Debug Info",
-		Long:  "Prints debugging information about the server",
+		Short: "Server Debug Info",
+		Long:  "Prints debugging information about the Smarthome server",
 		Args:  cobra.NoArgs,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
@@ -150,8 +159,8 @@ func Execute() {
 	// Parent configuration commands
 	cmdConfig := &cobra.Command{
 		Use:   "config",
-		Short: "REPL configuration",
-		Long:  "Retrieve and update the REPL configuration. If no arguments are provided, the configuration is printed. The configuration can be updated with [Username, Password, SmarthomeURL]",
+		Short: "CLI configuration",
+		Long:  "Retrieve and update the CLI configuration. If no arguments are provided, the configuration is printed. The configuration can be updated with [Username, Password, SmarthomeURL]",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := cmd.Help(); err != nil {
@@ -286,31 +295,44 @@ func Execute() {
 	var runOnlyLocal = false
 	cmdWsRun := &cobra.Command{
 		Use:   "run",
-		Short: "Run local homescript project",
+		Short: "Run current project",
 		Long:  "Executes the local state of the homescript file on the server",
-		Args:  cobra.NoArgs,
+		Args:  cobra.ArbitraryArgs,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			startTime := time.Now()
-			InitConn()
+			// Read local workspace data
 			content, config, err := workspace.ReadLocalData(Connection)
 			if err != nil {
 				fmt.Printf("Error: %s\n", err.Error())
 				os.Exit(1)
 			}
+			// Prepare Homescript arguments
+			hmsArgs := make(map[string]string, 0)
+			if len(args) > 0 {
+				hmsArgsTemp, err := processHmsArgs(args)
+				if err != nil {
+					fmt.Println(err.Error())
+					os.Exit(1)
+				}
+				hmsArgs = hmsArgsTemp
+			}
+			// Initialize connection to the Smarthome server
+			InitConn()
+			// Run the Homescript code
 			var exitCode int
 			if runOnlyLocal {
 				if Verbose {
 					fmt.Printf("Executing `%s.hms` using local state", config.Id)
 				}
-				exitCode = RunCode(string(content), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = RunCode(string(content), hmsArgs, fmt.Sprintf("%s.hms", config.Id))
 			} else {
 				if Verbose {
 					fmt.Printf("Executing `%s.hms` using remote state", config.Id)
 				}
-				exitCode = RunCode(fmt.Sprintf("print(exec('%s'))", config.Id), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = RunById(config.Id, hmsArgs)
 			}
 			if exitCode != 0 {
 				fmt.Printf("Homescript terminated with exit code: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
@@ -327,30 +349,41 @@ func Execute() {
 		Use:   "lint",
 		Short: "Lint local homescript project",
 		Long:  "Executes the script as dry-run in order to lint for errors",
-		Args:  cobra.NoArgs,
+		Args:  cobra.ArbitraryArgs,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			InitConn()
+			// Prepare Homescript arguments
+			hmsArgs := make(map[string]string, 0)
+			if len(args) > 0 {
+				hmsArgsTemp, err := processHmsArgs(args)
+				if err != nil {
+					fmt.Println(err.Error())
+					os.Exit(1)
+				}
+				hmsArgs = hmsArgsTemp
+			}
+			// Read the local workspace data
 			content, config, err := workspace.ReadLocalData(Connection)
 			if err != nil {
 				fmt.Printf("Error: %s\n", err.Error())
 				os.Exit(1)
 			}
-
+			// Initialize connection to the Smarthome server
+			InitConn()
+			// Lint the Homescript using the data and arguments
 			var exitCode int
 			if lintOnRemote {
 				if Verbose {
-					fmt.Printf("Linting`%s.hms` using current remote state", config.Id)
+					fmt.Printf("Linting `%s.hms` using current remote state", config.Id)
 				}
-				exitCode = LintCode(fmt.Sprintf("print(exec('%s'))", config.Id), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
-				// TODO: use future by-id implementation of lint
+				exitCode = LintById(config.Id, hmsArgs)
 			} else {
 				if Verbose {
 					fmt.Printf("Linting `%s.hms` using local state", config.Id)
 				}
-				exitCode = LintCode(string(content), make(map[string]string, 0), fmt.Sprintf("%s.hms", config.Id))
+				exitCode = LintCode(string(content), hmsArgs, fmt.Sprintf("%s.hms", config.Id))
 			}
 			os.Exit(exitCode)
 		},
@@ -361,7 +394,7 @@ func Execute() {
 	cmdWSRemove := &cobra.Command{
 		Use:   "rm [hms-id]",
 		Short: "removes a project",
-		Long:  "Removes project locally and can purge it on the remote if the -P flag is set.",
+		Long:  "Removes project locally and will purge it on the remote if the -P flag is set.",
 		Args:  cobra.ExactArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
@@ -385,7 +418,7 @@ func Execute() {
 			InitConn()
 			if !all {
 				if len(args) == 0 {
-					fmt.Sprintln("Error: accepts 1 arg(s), received 0")
+					fmt.Sprintln("Error: accepts 1 arg, received 0")
 					if err := cmd.Help(); err != nil {
 						panic(err.Error())
 					}

@@ -11,8 +11,13 @@ clean:
 	rm -rf bin
 	rm -rf build
 
+# Change version
+version:
+	python3 update_version.py
+
 # Github release
-gh release create v$(version) ./build/*.tar.gz -F ./CHANGELOG.md -t 'CLI v$(version)'  --prerelease
+gh-release:
+	gh release create v$(version) ./build/*.tar.gz -F ./CHANGELOG.md -t 'CLI v$(version)'  --prerelease
 
 # Builds
 build: clean linux

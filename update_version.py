@@ -5,6 +5,7 @@ import re
 
 makefile_path = "./Makefile"
 root_go_path = "./cmd/root.go"
+readme_path = "./README.md"
 
 # Extract old version from root.go
 with open(root_go_path, "r") as root_go:
@@ -40,5 +41,20 @@ with open(makefile_path, 'r') as makefile:
 
 with open(makefile_path, 'w') as makefile:
     makefile.write(content.replace(old_version, VERSION))
+
+with open(readme_path, "r") as readme:
+    content = readme.read()
+    old_version = content.split('## Installation of v')[
+        1].split(' (for Linux/AMD64)\n')[0]
+    print(f"Found old version in {readme_path}: {old_version}")
+
+with open(readme_path, "r") as readme:
+    content = readme.read()
+    old_version = content.split('cd /tmp && wget https://github.com/smarthome-go/cli/releases/download/v')[
+        1].split('/homescript_linux_amd64.tar.gz')[0]
+    print(f"Found old version 2 in {readme_path}: {old_version}")
+
+with open(readme_path, "w") as readme:
+    readme.write(content.replace(old_version, VERSION))
 
 print(f"Version has been changed from '{old_version}' -> '{VERSION}'")

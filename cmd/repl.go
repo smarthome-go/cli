@@ -163,9 +163,15 @@ func StartRepl() {
 			continue
 		}
 		if strings.ReplaceAll(line, " ", "") == "#reload" {
+			if Verbose {
+				fmt.Printf("Reconnecting: (using %s@%s)\n", Connection.Username, Connection.SmarthomeURL.Hostname())
+			}
 			// Reconnect
 			InitConn()
 
+			if Verbose {
+				fmt.Println("Updating available switches...")
+			}
 			// Fetch the user switches again
 			switches, err := Connection.GetPersonalSwitches()
 			if err != nil {
@@ -195,6 +201,9 @@ func StartRepl() {
 			continue
 		}
 
+		if Verbose {
+			fmt.Printf("Executing current line. (using %s@%s)\n", Connection.Username, Connection.SmarthomeURL.Hostname())
+		}
 		startTime := time.Now()
 		exitCode := RunCode(line, make(map[string]string, 0), "repl")
 		var display string

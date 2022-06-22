@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/rodaine/table"
@@ -81,6 +83,13 @@ func writeConfig(username string, password string, smarthomeUrl string) {
 	}
 	if smarthomeUrl == "" {
 		smarthomeUrl = Url
+	}
+	if !strings.HasPrefix(smarthomeUrl, "https://") || !strings.HasPrefix(smarthomeUrl, "http://") {
+		smarthomeUrl = "http://" + smarthomeUrl
+	}
+	if _, err := url.Parse(smarthomeUrl); err != nil {
+		fmt.Println("Invalid URL specified: please provide a valid URL.")
+		os.Exit(1)
 	}
 	data := map[string]string{
 		"Username":     username,

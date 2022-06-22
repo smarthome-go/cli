@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -15,6 +16,10 @@ func InitConn() {
 	s.Prefix = "Connecting to Smarthome "
 	PromptLogin()
 	s.Start()
+	if !strings.HasPrefix(Url, "https://") && !strings.HasPrefix(Url, "http://") {
+		fmt.Println("Warning: no URL scheme specified: using insecure HTTP")
+		Url = "http://" + Url
+	}
 	conn, err := sdk.NewConnection(Url, sdk.AuthMethodCookie)
 	if err != nil {
 		s.FinalMSG = fmt.Sprintf("Could not prepare connection via SDK for Smarthome-server (url: '%s'). Error: %s", Url, err.Error())

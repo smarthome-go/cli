@@ -2,7 +2,7 @@ module github.com/smarthome-go/cli
 
 go 1.18
 
-require github.com/smarthome-go/sdk v0.11.0
+require github.com/smarthome-go/sdk v0.14.0
 
 require (
 	github.com/briandowns/spinner v1.18.1
@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

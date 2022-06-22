@@ -78,25 +78,10 @@ func StartRepl() {
 	}
 	Switches = switches
 
-	// Try to fetch debug information
-	hasFetchedDebug := true
-	debugInfo, err := Connection.GetDebugInfo()
-	if err != nil {
-		defer s.Stop()
-		switch err {
-		case sdk.ErrConnFailed:
-			fmt.Printf("Failed to fetch debug info: connection to Smarthome (%s) interrupted.\n", Connection.SmarthomeURL.Hostname())
-		case sdk.ErrPermissionDenied:
-			fmt.Printf("Your user (%s) does not have the permission to view debug information.\n", Connection.Username)
-		}
-		hasFetchedDebug = false
-	}
 	initCompleter()
 	s.Stop()
 	fmt.Printf("Welcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m\n", Version)
-	if hasFetchedDebug {
-		fmt.Printf("Server: v%s:%s on \x1b[35m%s\x1b[0m\n", debugInfo.ServerVersion, debugInfo.GoVersion, Url)
-	}
+	fmt.Printf("Server: v%s:%s on \x1b[35m%s\x1b[0m\n", Connection.SmarthomeVersion, Connection.SmarthomeGoVersion, Url)
 	cacheDir, err := os.UserCacheDir()
 	var historyFile string
 	if err != nil {

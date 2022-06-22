@@ -28,6 +28,11 @@ func InitConn() {
 	}
 	Connection = conn
 	if err := Connection.Connect(Username, Password); err != nil {
+		if err == sdk.ErrInvalidVersion {
+			// The Server is not compatible with the current client
+			// TODO: write a list of supported versions in README
+			s.FinalMSG = fmt.Sprintf("Could not initialize SDK for Smarthome-server. Incompatible Server version: This client (v%s) requires minimal server version %s but the server is running %s.\nYou can try upgrading your server or downgrading this client.\n", sdk.Version, sdk.MinSmarthomeVersion, Connection.SmarthomeVersion)
+		}
 		s.FinalMSG = fmt.Sprintf("Could not initialize SDK for Smarthome-server (url: '%s'). Error: %s\nYou can validate you local configuration parameters using \x1b[32m'homescript config'\x1b[0m\n", Url, err.Error())
 		s.Stop()
 		os.Exit(99)

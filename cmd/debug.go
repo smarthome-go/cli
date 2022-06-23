@@ -71,12 +71,15 @@ func printDebugInfo() {
 	tbl.AddRow("Power jobs", debugInfo.PowerJobCount)
 	tbl.AddRow("Power jobs (FAILED)", debugInfo.PowerJobWithErrorCount)
 
-	// Database online
+	// Database status
 	onlineStr := "online"
 	if !debugInfo.DatabaseOnline {
 		onlineStr = "OFFLINE"
 	}
 	tbl.AddRow("DB status", onlineStr)
+	tbl.AddRow("DB conns (open)", debugInfo.DatabaseStats.OpenConnections)
+	tbl.AddRow("DB conns (used)", debugInfo.DatabaseStats.InUse)
+	tbl.AddRow("DB conns (idle)", debugInfo.DatabaseStats.Idle)
 
 	// Hardware node information
 	tbl.AddRow("HW nodes (total  )", debugInfo.HardwareNodesCount)

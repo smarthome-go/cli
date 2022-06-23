@@ -26,3 +26,5 @@ require (
 	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
 )
+
+replace github.com/smarthome-go/sdk => ../sdk

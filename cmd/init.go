@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/briandowns/spinner"
 	"github.com/howeyc/gopass"
 	"github.com/smarthome-go/sdk"
@@ -28,12 +29,31 @@ func InitConn() {
 	}
 	Connection = conn
 	if err := Connection.Connect(Username, Password); err != nil {
-		if err == sdk.ErrInvalidVersion {
+		if err == sdk.ErrUnsupportedVersion {
 			// The Server is not compatible with the current client
-			// TODO: write a list of supported versions in README
-			s.FinalMSG = fmt.Sprintf("Could not initialize SDK for Smarthome-server. Incompatible Server version: This client (v%s) requires minimal server version %s but the server is running %s.\nYou can try upgrading your server or downgrading this client.\n", sdk.Version, sdk.MinSmarthomeVersion, Connection.SmarthomeVersion)
+			s.FinalMSG = fmt.Sprintf("Could not establish connection to unsupported server.\nThis client (v%s) requires minimal server version '%s' but is using '%s'.\n", sdk.Version, sdk.MinSmarthomeVersion, Connection.SmarthomeVersion)
+			serverV, err := semver.NewVersion(Connection.SmarthomeVersion)
+			if err != nil {
+				// These errors usually can't happen due to SDK validation
+				s.FinalMSG = fmt.Sprintf("Invalid SemVer version of server: %s\n", err.Error())
+				s.Stop()
+				os.Exit(99)
+			}
+			supportV, err2 := semver.NewVersion(sdk.MinSmarthomeVersion)
+			if err2 != nil {
+				// These errors usually can't happen due to SDK validation
+				s.FinalMSG = fmt.Sprintf("Invalid SemVer version of SDK requirement: %s\n", err.Error())
+				s.Stop()
+				os.Exit(99)
+			}
+			if serverV.Major() > supportV.Major() {
+				s.FinalMSG += fmt.Sprintf("The supported major version has been superceeded.\n  Required: %10s [deprecated]\n  Server:   %10s [current]\n=> Try installing the current version of the CLI.\n", "v"+sdk.MinSmarthomeVersion, "v"+Connection.SmarthomeVersion)
+			} else if serverV.LessThan(supportV) {
+				s.FinalMSG += fmt.Sprintf("The server is outdated.\n  Required: %10s [current]\n  Server:   %10s [deprecated]\n=> Try installing the current version of the server.\n", "v"+sdk.MinSmarthomeVersion, "v"+Connection.SmarthomeVersion)
+			}
+		} else {
+			s.FinalMSG = fmt.Sprintf("Could not initialize SDK for Smarthome-server (url: '%s').\n  Error: %s\n=> You can revise your local configuration using \x1b[32m'%s config'\x1b[0m\n", Url, err.Error(), os.Args[0])
 		}
-		s.FinalMSG = fmt.Sprintf("Could not initialize SDK for Smarthome-server (url: '%s'). Error: %s\nYou can validate you local configuration parameters using \x1b[32m'homescript config'\x1b[0m\n", Url, err.Error())
 		s.Stop()
 		os.Exit(99)
 	}

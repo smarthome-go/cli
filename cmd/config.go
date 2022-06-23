@@ -84,7 +84,7 @@ func writeConfig(username string, password string, smarthomeUrl string) {
 	if smarthomeUrl == "" {
 		smarthomeUrl = Url
 	}
-	if !strings.HasPrefix(smarthomeUrl, "https://") || !strings.HasPrefix(smarthomeUrl, "http://") {
+	if !strings.HasPrefix(smarthomeUrl, "https://") && !strings.HasPrefix(smarthomeUrl, "http://") {
 		smarthomeUrl = "http://" + smarthomeUrl
 	}
 	if _, err := url.Parse(smarthomeUrl); err != nil {

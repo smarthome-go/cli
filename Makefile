@@ -17,7 +17,7 @@ version:
 
 # Github release
 gh-release:
-	gh release create v$(version) ./build/*.tar.gz -F ./CHANGELOG.md -t 'CLI v$(version)'  --prerelease
+	gh release create v$(version) ./build/*.tar.gz -F ./CHANGELOG.md -t 'CLI v$(version)'
 
 # Builds
 build: clean linux

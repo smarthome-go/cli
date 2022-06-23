@@ -10,6 +10,7 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/chzyer/readline"
 
+	"github.com/smarthome-go/cli/cmd/workspace"
 	"github.com/smarthome-go/sdk"
 )
 
@@ -54,6 +55,7 @@ func initCompleter() {
 		readline.PcItem("#exit"),
 		readline.PcItem("#switches"),
 		readline.PcItem("#power"),
+		readline.PcItem("#hmsls"),
 		readline.PcItem("#debug"),
 		readline.PcItem("#config"),
 		readline.PcItem("#verbose"),
@@ -130,6 +132,10 @@ func StartRepl() {
 		}
 		if strings.ReplaceAll(line, " ", "") == "#power" {
 			powerStats()
+			continue
+		}
+		if strings.ReplaceAll(line, " ", "") == "#hmsls" {
+			workspace.ListAll(Connection)
 			continue
 		}
 		if strings.ReplaceAll(line, " ", "") == "#debug" {

@@ -92,6 +92,35 @@ func Execute() {
 			os.Exit(exitCode)
 		},
 	}
+	cmdPower := &cobra.Command{
+		Use:   "power [on/off] [switch-id] ",
+		Short: "Change switch power",
+		Long:  "Change the power state of an arbitrary switch.",
+		Args:  cobra.ExactArgs(2),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			readConfigFile()
+			// Initialize Smarthome connection
+			InitConn()
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			// Change switch power
+			powerOn := false
+			switch args[0] {
+			case "on":
+				powerOn = true
+			case "off":
+			default:
+				fmt.Printf("Error: first argumemt [power-state] has to be either `on` or `off`")
+				os.Exit(1)
+			}
+			if err := Connection.SetPower(args[1], powerOn); err != nil {
+				fmt.Sprintf("Could not set power: %s\n", err.Error)
+				os.Exit(1)
+			}
+			fmt.Printf("Successfully turned switch %s %s.\n", args[1], args[0])
+			os.Exit(0)
+		},
+	}
 	cmdInfo := &cobra.Command{
 		Use:   "debug",
 		Short: "Server Debug Info",
@@ -146,6 +175,7 @@ func Execute() {
 	}
 
 	rootCmd.AddCommand(cmdRun)
+	rootCmd.AddCommand(cmdPower)
 	rootCmd.AddCommand(cmdInfo)
 	rootCmd.AddCommand(cmdPipeIn)
 	rootCmd.AddCommand(cmdListSwitches)

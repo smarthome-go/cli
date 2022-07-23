@@ -4,24 +4,24 @@
 Smarthome-cli's (formerly Homescript-cli) original purpose is to represent a powerful command-line-interface for the Smarthome server.
 A sample output of a *REPL* session can be found below
 ```
-Welcome to Homescript interactive v2.2.0-beta. CLI commands and comments start with #
-Server: v0.0.26:go1.18.1 on http://cloud.box:8123
-admin@homescript> 
+Welcome to Homescript interactive v2.8.0. CLI commands and comments start with #
+Server: v0.0.47:go1.18.3 on http://smarthome.box
+admin@homescript>
 ```
 
 ## Help Output
 ```
-homescript-cli v2.2.0-beta : A command line interface for the smarthome server using homescript
+homescript-cli v2.8.0 : A command line interface for the smarthome server using homescript
 A working and set-up Smarthome server instance is required.
 For more information and usage documentation visit:
 
-  The Homescript Programming Language:
+  [1;32mThe Homescript Programming Language:[1;0m
   - https://github.com/smarthome-go/homescript
 
-  The CLI Interface For Homescript:
+  [1;33mThe CLI Interface For Homescript:[1;0m
   - https://github.com/smarthome-go/cli
 
-  The Smarthome Server:
+  [1;34mThe Smarthome Server:[1;0m
   - https://github.com/smarthome-go/smarthome
 
 Usage:
@@ -30,12 +30,13 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
-  config      REPL configuration
-  debug       Smarthome Server Debug Info
+  config      CLI configuration
+  debug       Server Debug Info
   help        Help about any command
   pipe        Run Code via Stdin
+  power       Change switch power
   power       Power Summary
-  run         Run a homescript file
+  run         Run a Homescript file
   switches    List switches
   ws          workspace
 

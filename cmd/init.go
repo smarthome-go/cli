@@ -47,7 +47,7 @@ func InitConn() {
 				os.Exit(99)
 			}
 			if serverV.Major() > supportV.Major() {
-				s.FinalMSG += fmt.Sprintf("The supported major version has been superceeded.\n  Required: %10s [deprecated]\n  Server:   %10s [current]\n=> Try installing the current version of the CLI.\n", "v"+sdk.MinSmarthomeVersion, "v"+Connection.SmarthomeVersion)
+				s.FinalMSG += fmt.Sprintf("The supported major version has been superseded.\n  Required: %10s [deprecated]\n  Server:   %10s [current]\n=> Try installing the current version of the CLI.\n", "v"+sdk.MinSmarthomeVersion, "v"+Connection.SmarthomeVersion)
 			} else if serverV.LessThan(supportV) {
 				s.FinalMSG += fmt.Sprintf("The server is outdated.\n  Required: %10s [current]\n  Server:   %10s [deprecated]\n=> Try installing the current version of the server.\n", "v"+sdk.MinSmarthomeVersion, "v"+Connection.SmarthomeVersion)
 			}

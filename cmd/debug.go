@@ -34,24 +34,6 @@ func printDebugInfo() {
 	s.Stop()
 
 	// Generate output
-	/*
-		var output string
-		output += color.New(color.FgGreen, color.Underline).Sprintf("Parameter%sValue%s\n", strings.Repeat(" ", 24), strings.Repeat(" ", 10))
-		output += fmt.Sprintf("Smarthome Server Version: %s   v%s\n", strings.Repeat(" ", 30-len("Smarthome Server Version: ")), debugInfo.ServerVersion)
-		var databaseOnlineString = "\x1b[1;31mNO\x1b[1;0m"
-		if debugInfo.DatabaseOnline {
-			databaseOnlineString = "\x1b[1;32mYES\x1b[1;0m"
-		}
-		output += fmt.Sprintf("Database Online: %s   %- 10s\n", strings.Repeat(" ", 30-len("Database Online: ")), databaseOnlineString)
-		output += fmt.Sprintf("Compiled with: %s   %- 10s\n", strings.Repeat(" ", 30-len("Compiled with: ")), debugInfo.GoVersion)
-		output += fmt.Sprintf("CPU Cores: %s   %d\n", strings.Repeat(" ", 30-len("CPU Cores: ")), debugInfo.CpuCores)
-		output += fmt.Sprintf("Current Goroutines: %s   %d\n", strings.Repeat(" ", 30-len("Current Goroutines: ")), debugInfo.Goroutines)
-		output += fmt.Sprintf("Current Memory Usage: %s   %d\n", strings.Repeat(" ", 30-len("Current Memory Usage: ")), debugInfo.MemoryUsage)
-		output += fmt.Sprintf("Current Power Jobs: %s   %d\n", strings.Repeat(" ", 30-len("Current Power Jobs: ")), debugInfo.PowerJobCount)
-		output += fmt.Sprintf("Last Power Job Error Count: %s   %d", strings.Repeat(" ", 30-len("Last Power Job Error Count: ")), debugInfo.PowerJobWithErrorCount)
-		fmt.Println(output)
-	*/
-
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	// columnFmt := color.New(color.FgWhite).SprintfFunc()
 
@@ -85,6 +67,7 @@ func printDebugInfo() {
 	tbl.AddRow("HW nodes (total  )", debugInfo.HardwareNodesCount)
 	tbl.AddRow("HW nodes (online )", debugInfo.HardwareNodesOnline)
 	tbl.AddRow("HW nodes (enabled)", debugInfo.HardwareNodesEnabled)
+	tbl.AddRow("HMS jobs", debugInfo.HomescriptJobCount)
 
 	tbl.Print()
 

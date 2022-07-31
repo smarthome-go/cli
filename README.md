@@ -1,5 +1,8 @@
 # Smarthome-cli
 
+[![Go Build](https://github.com/smarthome-go/cli/actions/workflows/go.yml/badge.svg)](https://github.com/smarthome-go/cli/actions/workflows/go.yml)
+[![Typo Check](https://github.com/smarthome-go/cli/actions/workflows/typos.yml/badge.svg)](https://github.com/smarthome-go/cli/actions/workflows/typos.yml)
+
 ## REPL
 Smarthome-cli's (formerly Homescript-cli) original purpose is to represent a powerful command-line-interface for the Smarthome server.
 A sample output of a *REPL* session can be found below

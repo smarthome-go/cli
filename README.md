@@ -52,6 +52,14 @@ Use "homescript [command] --help" for more information about a command.
 ```
 
 ## Installation of v2.9.0 (for Linux/AMD64)
+
 ```
 cd /tmp && wget https://github.com/smarthome-go/cli/releases/download/v2.9.0/homescript_linux_amd64.tar.gz && tar -xvf homescript_linux_amd64.tar.gz && sudo mv homescript /usr/bin && rm -rf homescript_linux_amd64.tar.gz
+```
+
+## Installation on Arch Linux
+
+```bash
+  yay -S smarthome-cli
+# paru -S smarthome-cli
 ```

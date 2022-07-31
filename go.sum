@@ -48,6 +48,8 @@ github.com/smarthome-go/sdk v0.14.1 h1:dHt07MERQio+fNN51RdPa3WZtj3ib4dRQz2F53Sbk
 github.com/smarthome-go/sdk v0.14.1/go.mod h1:0JktAhdOwOb569SP660NuiPNeP4yAP+KqUpG4y5ZL6g=
 github.com/smarthome-go/sdk v0.15.0 h1:4giVIp3JdRH0lZnEL1Ph2aCQn8L9pllGfAdxXvzHAGs=
 github.com/smarthome-go/sdk v0.15.0/go.mod h1:0JktAhdOwOb569SP660NuiPNeP4yAP+KqUpG4y5ZL6g=
+github.com/smarthome-go/sdk v0.16.0 h1:MWUSSpagd9FTZczc38Os48rdniATem3g1FtHCg69k60=
+github.com/smarthome-go/sdk v0.16.0/go.mod h1:0JktAhdOwOb569SP660NuiPNeP4yAP+KqUpG4y5ZL6g=
 github.com/spf13/cobra v1.4.0 h1:y+wJpx64xcgO1V+RcnwW0LEHxTKRi2ZDPSBjWnrg88Q=
 github.com/spf13/cobra v1.4.0/go.mod h1:Wo4iy3BUC+X2Fybo0PDqwJIv3dNRiZLHQymsfxlB84g=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=

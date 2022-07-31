@@ -2,7 +2,7 @@ module github.com/smarthome-go/cli
 
 go 1.18
 
-require github.com/smarthome-go/sdk v0.15.0
+require github.com/smarthome-go/sdk v0.16.0
 
 require (
 	github.com/Masterminds/semver v1.5.0

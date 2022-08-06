@@ -10,6 +10,7 @@ tar = mkdir -p build && tar -cvzf ./$(appname)_$(1)_$(2).tar.gz $(appname)$(3) &
 clean:
 	rm -rf bin
 	rm -rf build
+	rm -f homescript
 
 # Change version
 version:

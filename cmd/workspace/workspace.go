@@ -3,7 +3,6 @@ package workspace
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -106,7 +105,7 @@ func createProjectFiles(id string, name string) error {
 	if err := os.Mkdir(id, 0755); err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(
+	if err := os.WriteFile(
 		fmt.Sprintf("./%s/%s.hms", id, id),
 		[]byte(fmt.Sprintf("# Write your code for `%s` below", id)),
 		0775,
@@ -143,7 +142,7 @@ func PushLocal(c *sdk.Connection) {
 		}
 		os.Exit(1)
 	}
-	content, err := ioutil.ReadFile("./hms.toml")
+	content, err := os.ReadFile("./hms.toml")
 	if err != nil {
 		fmt.Printf("Could not push local state: failed to read `hms.toml`: %s\n", err.Error())
 		os.Exit(1)
@@ -153,7 +152,7 @@ func PushLocal(c *sdk.Connection) {
 		fmt.Printf("Could not push local state: failed to parse `hms.toml`: %s\n", err.Error())
 		os.Exit(1)
 	}
-	hmsContent, err := ioutil.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
+	hmsContent, err := os.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
 	if err != nil {
 		fmt.Printf("Could not push local state: failed to read homescript file: %s\n", err.Error())
 		os.Exit(1)
@@ -230,7 +229,7 @@ func PullLocal(c *sdk.Connection) {
 		}
 		os.Exit(1)
 	}
-	content, err := ioutil.ReadFile("./hms.toml")
+	content, err := os.ReadFile("./hms.toml")
 	if err != nil {
 		fmt.Printf("Could not pull remote state: failed to read `hms.toml`: %s\n", err.Error())
 		os.Exit(1)
@@ -241,7 +240,7 @@ func PullLocal(c *sdk.Connection) {
 		os.Exit(1)
 	}
 	// Read hms-file content before change
-	hmsContent, err := ioutil.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
+	hmsContent, err := os.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
 	if err != nil {
 		fmt.Printf("Could not pull remote state: failed to read homescript file: %s\n", err.Error())
 		os.Exit(1)
@@ -264,17 +263,17 @@ func PullLocal(c *sdk.Connection) {
 		Description:         remote.Data.Description,
 		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
 		SchedulerEnabled:    remote.Data.SchedulerEnabled,
-		MDIcon:              configToml.MDIcon,
+		MDIcon:              remote.Data.MDIcon,
 	})
 	if err != nil {
 		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
 		os.Exit(1)
 	}
-	if err := ioutil.WriteFile("hms.toml", data, 0775); err != nil {
+	if err := os.WriteFile("hms.toml", data, 0775); err != nil {
 		fmt.Printf("Could not pull remote state: failed to update `hms.toml` config file: %s\n", err.Error())
 		os.Exit(1)
 	}
-	if err := ioutil.WriteFile(fmt.Sprintf("%s.hms", configToml.Id), []byte(remote.Data.Code), 0775); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s.hms", configToml.Id), []byte(remote.Data.Code), 0775); err != nil {
 		fmt.Printf("Could not pull remote state: failed to update local `.hms` file: %s\n", err.Error())
 		os.Exit(1)
 	}
@@ -309,7 +308,7 @@ func PullLocal(c *sdk.Connection) {
 
 // Reads the `hms.toml` file in the current project and returns a struct
 func ReadLocalData(c *sdk.Connection) (string, ConfigToml, error) {
-	content, err := ioutil.ReadFile("./hms.toml")
+	content, err := os.ReadFile("./hms.toml")
 	if err != nil {
 		fmt.Println("Failed to read `hms.toml`: Are you inside a Homescript project?")
 		return "", ConfigToml{}, err
@@ -319,7 +318,7 @@ func ReadLocalData(c *sdk.Connection) (string, ConfigToml, error) {
 		fmt.Println("Failed to parse `hms.toml`")
 		return "", ConfigToml{}, err
 	}
-	hmsContent, err := ioutil.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
+	hmsContent, err := os.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
 	if err != nil {
 		fmt.Println("Failed to read homescript file")
 		return "", ConfigToml{}, err
@@ -397,11 +396,11 @@ func Clone(c *sdk.Connection, id string) {
 		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
 		os.Exit(1)
 	}
-	if err := ioutil.WriteFile(fmt.Sprintf("./%s/hms.toml", id), data, 0775); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("./%s/hms.toml", id), data, 0775); err != nil {
 		fmt.Printf("Could not pull remote state: failed to update `hms.toml` config file: %s\n", err.Error())
 		os.Exit(1)
 	}
-	if err := ioutil.WriteFile(fmt.Sprintf("./%s/%s.hms", id, id), []byte(remote.Data.Code), 0775); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("./%s/%s.hms", id, id), []byte(remote.Data.Code), 0775); err != nil {
 		fmt.Printf("Could not pull remote state: failed to update local `.hms` file: %s\n", err.Error())
 		os.Exit(1)
 	}

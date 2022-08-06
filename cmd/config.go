@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -33,7 +32,7 @@ func readConfigFile() {
 		}
 		return
 	}
-	fileContent, err := ioutil.ReadFile(configFilePath)
+	fileContent, err := os.ReadFile(configFilePath)
 	if err != nil {
 		fmt.Println("Failed to read Homescript config file")
 		os.Exit(1)
@@ -118,7 +117,7 @@ func writeConfig(username string, password string, smarthomeUrl string) {
 		return
 	}
 
-	if err := ioutil.WriteFile(configFilePath, output, 0600); err != nil {
+	if err := os.WriteFile(configFilePath, output, 0600); err != nil {
 		fmt.Println("Failed to update configuration: could not write to config file: ", err.Error())
 		os.Exit(1)
 	}

@@ -19,6 +19,14 @@ version:
 gh-release:
 	gh release create v$(version) ./build/*.tar.gz -F ./CHANGELOG.md -t 'CLI v$(version)'
 
+lint:
+	go vet
+	golangci-lint run
+	typos
+
+# Release (currently only build)
+release: clean lint build
+
 # Builds
 build: clean linux
 

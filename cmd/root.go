@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -32,12 +31,12 @@ var Config = map[string]string{
 
 var (
 	rootCmd = &cobra.Command{
-		Use:     "homescript",
-		Short:   "Homescript language CLI",
+		Use:     "smarthome-cli",
+		Short:   "Smarthome CLI",
 		Version: Version,
 		Long: "" +
-			fmt.Sprintf("homescript-cli v%s : ", Version) +
-			"A command line interface for the smarthome server using homescript\n" +
+			fmt.Sprintf("smarthome-cli v%s : ", Version) +
+			"A command line interface for the smarthome server\n" +
 			"A working and set-up Smarthome server instance is required.\n" +
 			"For more information and usage documentation visit:\n" +
 			"\n" +
@@ -69,7 +68,7 @@ func Execute() {
 		Run: func(cmd *cobra.Command, args []string) {
 			startTime := time.Now()
 			// Read file
-			content, err := ioutil.ReadFile(args[0])
+			content, err := os.ReadFile(args[0])
 			if err != nil {
 				fmt.Printf("Could not execute Homescript file '%s' due to fs error: %s\n", args[0], err.Error())
 				os.Exit(1)
@@ -90,35 +89,6 @@ func Execute() {
 				fmt.Printf("Homescript was executed successfully: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
 			}
 			os.Exit(exitCode)
-		},
-	}
-	cmdPower := &cobra.Command{
-		Use:   "power [on/off] [switch-id] ",
-		Short: "Change switch power",
-		Long:  "Change the power state of an arbitrary switch.",
-		Args:  cobra.ExactArgs(2),
-		PreRun: func(cmd *cobra.Command, args []string) {
-			readConfigFile()
-			// Initialize Smarthome connection
-			InitConn()
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			// Change switch power
-			powerOn := false
-			switch args[0] {
-			case "on":
-				powerOn = true
-			case "off":
-			default:
-				fmt.Printf("Error: first argumemt [power-state] has to be either `on` or `off`")
-				os.Exit(1)
-			}
-			if err := Connection.SetPower(args[1], powerOn); err != nil {
-				fmt.Sprintf("Could not set power: %s\n", err.Error)
-				os.Exit(1)
-			}
-			fmt.Printf("Successfully turned switch %s %s.\n", args[1], args[0])
-			os.Exit(0)
 		},
 	}
 	cmdInfo := &cobra.Command{
@@ -160,30 +130,16 @@ func Execute() {
 			listSwitches()
 		},
 	}
-	cmdPowerSummary := &cobra.Command{
-		Use:   "power",
-		Short: "Power Summary",
-		Long:  "A compact overview of estimated power usage and states",
-		Args:  cobra.NoArgs,
-		PreRun: func(cmd *cobra.Command, args []string) {
-			readConfigFile()
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			InitConn()
-			powerStats()
-		},
-	}
 
 	rootCmd.AddCommand(cmdRun)
-	rootCmd.AddCommand(cmdPower)
 	rootCmd.AddCommand(cmdInfo)
 	rootCmd.AddCommand(cmdPipeIn)
 	rootCmd.AddCommand(cmdListSwitches)
-	rootCmd.AddCommand(cmdPowerSummary)
 
 	// Subcommands
 	rootCmd.AddCommand(createCmdConfig())
 	rootCmd.AddCommand(createCmdWs())
+	rootCmd.AddCommand(createCmdPower())
 
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
 	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "smarthome user used for connection")

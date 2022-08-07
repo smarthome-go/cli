@@ -17,7 +17,7 @@ func readConfigFile() {
 		fmt.Println("Failed to determine user config directory, not reading config file")
 		return
 	}
-	configFilePath := fmt.Sprintf("%s/homescript.yaml", configDir)
+	configFilePath := fmt.Sprintf("%s/smarthome-cli.yaml", configDir)
 	_, err = os.Stat(configFilePath)
 	if os.IsNotExist(err) {
 		if Verbose {
@@ -125,7 +125,7 @@ func writeConfig(username string, password string, smarthomeUrl string, lintOnPu
 		fmt.Println("Failed to update configuration: could not determine user's config directory")
 		os.Exit(1)
 	}
-	configFilePath := fmt.Sprintf("%s/homescript.yaml", configDir)
+	configFilePath := fmt.Sprintf("%s/smarthome-cli.yaml", configDir)
 	_, err = os.Stat(configFilePath)
 	if os.IsNotExist(err) {
 		fmt.Println("Config file does not exist, creating...")
@@ -153,7 +153,7 @@ func deleteConfigFile() {
 		fmt.Println("Failed to delete configuration file: could not determine user's config directory")
 		os.Exit(1)
 	}
-	configFilePath := fmt.Sprintf("%s/homescript.yaml", configDir)
+	configFilePath := fmt.Sprintf("%s/smarthome-cli.yaml", configDir)
 	_, err = os.Stat(configFilePath)
 	if os.IsNotExist(err) {
 		fmt.Println("Did not delete configuration file: file is already deleted")

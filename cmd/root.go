@@ -8,16 +8,18 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/smarthome-go/cli/cmd/workspace"
 	"github.com/smarthome-go/sdk"
 )
 
 const Version = "2.11.1"
 
 var (
-	Verbose  bool
-	Username string
-	Password string
-	Url      string
+	Verbose    bool
+	Username   string
+	Password   string
+	Url        string
+	LintOnPush bool
 
 	Connection *sdk.Connection
 )
@@ -27,6 +29,7 @@ var Config = map[string]string{
 	"Username":     "",
 	"Password":     "",
 	"SmarthomeURL": "",
+	"LintOnPush":   "yes",
 }
 
 var (
@@ -82,7 +85,12 @@ func Execute() {
 			// Initialize Smarthome connection
 			InitConn()
 			// Execute code
-			exitCode := RunCode(string(content), hmsArgs, args[0])
+			exitCode := workspace.RunCode(
+				Connection,
+				string(content),
+				hmsArgs,
+				args[0],
+			)
 			if exitCode != 0 {
 				fmt.Printf("Homescript terminated with exit code: %d \x1b[90m[%.2fs]\x1b[1;0m\n", exitCode, time.Since(startTime).Seconds())
 			} else {
@@ -114,7 +122,11 @@ func Execute() {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			InitConn()
-			RunCode(strings.Join(args, "\n"), make(map[string]string, 0), "stdin")
+			workspace.RunCode(Connection,
+				strings.Join(args, "\n"),
+				make(map[string]string, 0),
+				"stdin",
+			)
 		},
 	}
 	cmdListSwitches := &cobra.Command{
@@ -138,13 +150,15 @@ func Execute() {
 
 	// Subcommands
 	rootCmd.AddCommand(createCmdConfig())
-	rootCmd.AddCommand(createCmdWs())
+	cmdWs := createCmdWs()
+	rootCmd.AddCommand(cmdWs)
 	rootCmd.AddCommand(createCmdPower())
 
-	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
-	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "smarthome user used for connection")
-	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "the user's password used for connection")
-	rootCmd.PersistentFlags().StringVarP(&Url, "ip", "i", "http://localhost", "URL used for connecting to Smarthome")
+	cmdWs.PersistentFlags().BoolVarP(&LintOnPush, "pushlint", "l", true, "Automatically lint the project before pushing it")
+	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Enables verbose output")
+	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "Smarthome-user used for the connection")
+	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "The user's password used for connection")
+	rootCmd.PersistentFlags().StringVarP(&Url, "ip", "i", "http://localhost", "URL of the target Smarthome instance")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())

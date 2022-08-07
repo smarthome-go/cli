@@ -196,7 +196,12 @@ func StartRepl() {
 			fmt.Printf("Executing current line. (using %s@%s)\n", Connection.Username, Connection.SmarthomeURL.Hostname())
 		}
 		startTime := time.Now()
-		exitCode := RunCode(line, make(map[string]string, 0), "repl")
+		exitCode := workspace.RunCode(
+			Connection,
+			line,
+			make(map[string]string, 0),
+			"repl",
+		)
 		var display string
 		if exitCode != 0 {
 			display = fmt.Sprintf(" \x1b[31m[%d]\x1b[0m", exitCode)

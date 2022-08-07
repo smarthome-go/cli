@@ -1,4 +1,4 @@
-package cmd
+package workspace
 
 import (
 	"fmt"
@@ -41,7 +41,7 @@ func printError(err sdk.HomescriptError, program string) {
 
 // Executes an arbitrary Homescript given its id
 // Error handling is done internally and printed directly
-func RunById(id string, args map[string]string) int {
+func RunById(connection *sdk.Connection, id string, args map[string]string) int {
 	s := spinner.New([]string{"⠏", "⠛", "⠹", "⢸", "⣰", "⣤", "⣆", "⡇"}, 100*time.Millisecond)
 	s.Prefix = "Executing Homescript "
 	s.FinalMSG = ""
@@ -60,11 +60,11 @@ func RunById(id string, args map[string]string) int {
 			}
 		}
 	}(&ch)
-	output, err := Connection.RunHomescriptById(id, args, time.Minute*2)
+	output, err := connection.RunHomescriptById(id, args, time.Minute*2)
 	ch <- struct{}{}
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
 			return 403
 		}
 		fmt.Println(err.Error())
@@ -73,7 +73,7 @@ func RunById(id string, args map[string]string) int {
 	if !output.Success || output.Exitcode != 0 {
 		fmt.Printf("Error: Program terminated abnormally with exit-code %d\n", output.Exitcode)
 		// Retrieve remote code in order to pretty-print the error
-		remoteData, err := Connection.GetHomescript(id)
+		remoteData, err := connection.GetHomescript(id)
 		if err != nil {
 			fmt.Printf("Could not download remote code for error display:\n%s\n", err.Error())
 			return 255
@@ -92,7 +92,7 @@ func RunById(id string, args map[string]string) int {
 
 // Executes an arbitrary string of Homescript code
 // Error handling is done internally and printed directly
-func RunCode(code string, args map[string]string, filename string) int {
+func RunCode(connection *sdk.Connection, code string, args map[string]string, filename string) int {
 	s := spinner.New([]string{"⠏", "⠛", "⠹", "⢸", "⣰", "⣤", "⣆", "⡇"}, 100*time.Millisecond)
 	s.Prefix = "Executing Homescript "
 	s.FinalMSG = ""
@@ -111,11 +111,11 @@ func RunCode(code string, args map[string]string, filename string) int {
 			}
 		}
 	}(&ch)
-	output, err := Connection.RunHomescriptCode(code, args, time.Minute*2)
+	output, err := connection.RunHomescriptCode(code, args, time.Minute*2)
 	ch <- struct{}{}
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
 			return 403
 		}
 		fmt.Println(err.Error())
@@ -137,11 +137,11 @@ func RunCode(code string, args map[string]string, filename string) int {
 
 // Lints an arbitrary Homescript given its id
 // Error handling is done internally and printed directly
-func LintById(id string, args map[string]string) int {
-	output, err := Connection.LintHomescriptById(id, args, time.Minute)
+func LintById(connection *sdk.Connection, id string, args map[string]string) int {
+	output, err := connection.LintHomescriptById(id, args, time.Minute)
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
 			return 403
 		}
 		fmt.Println(err.Error())
@@ -150,7 +150,7 @@ func LintById(id string, args map[string]string) int {
 	if !output.Success || output.Exitcode != 0 {
 		fmt.Printf("FAIL: linting discovered problems in '%s.hms':\n", id)
 		// Retrieve remote code in order to pretty-print the error
-		remoteData, err := Connection.GetHomescript(id)
+		remoteData, err := connection.GetHomescript(id)
 		if err != nil {
 			fmt.Printf("Could not download remote code for error display:\n%s\n", err.Error())
 			return 255
@@ -170,11 +170,11 @@ func LintById(id string, args map[string]string) int {
 
 // Lints an arbitrary string of Homescript code
 // Error handling is done internally and printed directly
-func LintCode(code string, args map[string]string, filename string) int {
-	output, err := Connection.LintHomescriptCode(code, args, time.Minute*2)
+func LintCode(connection *sdk.Connection, code string, args map[string]string, filename string) int {
+	output, err := connection.LintHomescriptCode(code, args, time.Minute*2)
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", Connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
 			return 403
 		}
 		fmt.Println(err.Error())

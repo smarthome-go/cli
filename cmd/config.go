@@ -23,7 +23,12 @@ func readConfigFile() {
 		if Verbose {
 			fmt.Println("Configuration file does not exist, creating...")
 		}
-		if err := os.WriteFile(configFilePath, []byte("Username:\nPassword:\nSmarthomeURL: http://localhost"), 0600); err != nil {
+		marshaled, err := yaml.Marshal(Config)
+		if err != nil {
+			fmt.Println("Could not create config file: ", err.Error())
+			return
+		}
+		if err := os.WriteFile(configFilePath, marshaled, 0600); err != nil {
 			fmt.Println("Could not create config file: ", err.Error())
 			return
 		}
@@ -59,6 +64,16 @@ func readConfigFile() {
 		}
 		Url = Config["SmarthomeURL"]
 	}
+	if Config["LintOnPush"] != "no" && Config["LintOnPush"] != "yes" {
+		fmt.Printf("Unexpected value in config file: `LintOnPush` holds invalid value: `%s`\n", Config["LintOnPush"])
+		os.Exit(1)
+	}
+	if LintOnPush && Config["LintOnPush"] != "yes" {
+		if Verbose {
+			fmt.Println("Selected lint-on-push option from config file.")
+		}
+		LintOnPush = false
+	}
 }
 
 func printConfig() {
@@ -71,7 +86,7 @@ func printConfig() {
 	tbl.Print()
 }
 
-func writeConfig(username string, password string, smarthomeUrl string) {
+func writeConfig(username string, password string, smarthomeUrl string, lintOnPush bool) {
 	fmt.Println("Updating REPL configuration...")
 	readConfigFile()
 	if username == "" {
@@ -90,10 +105,15 @@ func writeConfig(username string, password string, smarthomeUrl string) {
 		fmt.Println("Invalid URL specified: please provide a valid URL.")
 		os.Exit(1)
 	}
+	lintOnPushString := "no"
+	if lintOnPush {
+		lintOnPushString = "yes"
+	}
 	data := map[string]string{
 		"Username":     username,
 		"Password":     password,
 		"SmarthomeURL": smarthomeUrl,
+		"LintOnPush":   lintOnPushString,
 	}
 	output, err := yaml.Marshal(&data)
 	if err != nil {

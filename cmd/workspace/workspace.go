@@ -34,12 +34,14 @@ func New(id string, name string, c *sdk.Connection) {
 		os.Exit(1)
 	}
 	if err := c.CreateHomescript(sdk.HomescriptRequest{
-		Id:   id,
-		Name: name,
+		Id:     id,
+		Name:   name,
+		Code:   fmt.Sprintf("# Write your code for `%s` below", id),
+		MDIcon: "code",
 	}); err != nil {
 		switch err {
 		case sdk.ErrUnprocessableEntity:
-			fmt.Printf("Failed to create remote project: id (`%s`) already exists on remote.\n", id)
+			fmt.Printf("Failed to create remote project: The ID `%s` already exists on remote.\n", id)
 		case sdk.ErrPermissionDenied:
 			fmt.Printf("Failed to create remote project: permission denied: please ensure that you have the correct access rights to create new hms-objects.\n")
 		default:
@@ -133,7 +135,7 @@ func removeProjectFiles(id string) error {
 }
 
 // Reads the local project state and uploads it to the remote
-func PushLocal(c *sdk.Connection) {
+func PushLocal(c *sdk.Connection, lintOnPush bool) {
 	if _, err := os.Stat("hms.toml"); err != nil {
 		if os.IsNotExist(err) {
 			fmt.Println("You can only push local state inside a hms-project.")
@@ -154,7 +156,7 @@ func PushLocal(c *sdk.Connection) {
 	}
 	hmsContent, err := os.ReadFile(fmt.Sprintf("./%s.hms", configToml.Id))
 	if err != nil {
-		fmt.Printf("Could not push local state: failed to read homescript file: %s\n", err.Error())
+		fmt.Printf("Could not push local state: failed to read Homescript file: %s\n", err.Error())
 		os.Exit(1)
 	}
 	// Fetch current remote state for diff
@@ -169,6 +171,14 @@ func PushLocal(c *sdk.Connection) {
 			fmt.Printf("Could not pull remote state: server responded with unknown error: %s\n", err.Error())
 		}
 		os.Exit(1)
+	}
+	// Run optional pre-push lint hook
+	if lintOnPush {
+		fmt.Println("Running pre-push hook: linting local project...")
+		if LintCode(c, string(hmsContent), make(map[string]string), fmt.Sprintf("%s.hms", configToml.Id)) != 0 {
+			fmt.Println("Warning: Pre-push hook failed, continuing push...")
+		}
+
 	}
 	// Send modification request
 	if err := c.ModifyHomescript(sdk.HomescriptRequest{
@@ -307,7 +317,7 @@ func PullLocal(c *sdk.Connection) {
 }
 
 // Reads the `hms.toml` file in the current project and returns a struct
-func ReadLocalData(c *sdk.Connection) (string, ConfigToml, error) {
+func ReadLocalData() (string, ConfigToml, error) {
 	content, err := os.ReadFile("./hms.toml")
 	if err != nil {
 		fmt.Println("Failed to read `hms.toml`: Are you inside a Homescript project?")

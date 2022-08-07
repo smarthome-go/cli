@@ -51,6 +51,8 @@ func createCmdConfig() *cobra.Command {
 	setUsername := ""
 	setPassword := ""
 	setURL := ""
+	setLintOnPush := false
+
 	cmdConfigSet := &cobra.Command{
 		Use:   "set",
 		Short: "Update configuration",
@@ -66,12 +68,13 @@ func createCmdConfig() *cobra.Command {
 				}
 				return
 			}
-			writeConfig(setUsername, setPassword, setURL)
+			writeConfig(setUsername, setPassword, setURL, setLintOnPush)
 		},
 	}
-	cmdConfigSet.Flags().StringVarP(&setUsername, "new-username", "n", "", "username to be updated")
-	cmdConfigSet.Flags().StringVarP(&setPassword, "new-password", "t", "", "password to be updated")
-	cmdConfigSet.Flags().StringVarP(&setURL, "new-ip", "a", "", "url / ip to be updated")
+	cmdConfigSet.Flags().StringVarP(&setUsername, "new-username", "n", "", "New username to be updated")
+	cmdConfigSet.Flags().StringVarP(&setPassword, "new-password", "t", "", "New password to be updated")
+	cmdConfigSet.Flags().StringVarP(&setURL, "new-ip", "a", "", "New URL / ip to be updated")
+	cmdConfigSet.Flags().BoolVarP(&setLintOnPush, "new-lint-on-push", "l", false, "Whether to lint on every HMS workspace push action or not")
 	cmdConfig.AddCommand(cmdConfigSet)
 	return cmdConfig
 }

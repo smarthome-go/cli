@@ -93,7 +93,7 @@ func StartRepl() {
 		historyFile = fmt.Sprintf("%s/homescript.history", cacheDir)
 	}
 	l, err := readline.NewEx(&readline.Config{
-		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m> ", Username),
+		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m> ", Username, Connection.SmarthomeURL.Hostname()),
 		HistoryFile:     historyFile,
 		AutoComplete:    completer,
 		InterruptPrompt: "^C",
@@ -176,7 +176,7 @@ func StartRepl() {
 
 			// Reinitialize readline
 			l, err = readline.NewEx(&readline.Config{
-				Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m> ", Username),
+				Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m> ", Username, Connection.SmarthomeURL.Hostname()),
 				HistoryFile:     historyFile,
 				AutoComplete:    completer,
 				InterruptPrompt: "^C",
@@ -206,6 +206,6 @@ func StartRepl() {
 		if exitCode != 0 {
 			display = fmt.Sprintf(" \x1b[31m[%d]\x1b[0m", exitCode)
 		}
-		l.SetPrompt(fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34mhomescript\x1b[0m%s[\x1b[90m%.2fs\x1b[0m]> ", Username, display, time.Since(startTime).Seconds()))
+		l.SetPrompt(fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m%s[\x1b[90m%.2fs\x1b[0m]> ", Username, Connection.SmarthomeURL.Hostname(), display, time.Since(startTime).Seconds()))
 	}
 }

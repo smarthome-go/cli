@@ -1,7 +1,7 @@
 appname := homescript
 workingdir := "homescript-cli"
 sources := $(wildcard *.go)
-version := 2.11.0
+version := 2.11.1
 
 build = CGO_ENABLED=0 GOOS=$(1) GOARCH=$(2) go build -v -ldflags "-s -w" -o $(appname)$(3) $(4)
 tar = mkdir -p build && tar -cvzf ./$(appname)_$(1)_$(2).tar.gz $(appname)$(3) && mv $(appname)_$(1)_$(2).tar.gz build

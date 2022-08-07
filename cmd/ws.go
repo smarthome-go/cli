@@ -26,6 +26,8 @@ func createCmdWs() *cobra.Command {
 			}
 		},
 	}
+	cmdWS.PersistentFlags().BoolVarP(&LintOnPush, "pushlint", "l", true, "Automatically lint the project before pushing it")
+
 	cmdWSInit := &cobra.Command{
 		Use:   "new [hms-id] [project-name]",
 		Short: "Create a new project",

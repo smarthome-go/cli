@@ -12,7 +12,7 @@ import (
 	"github.com/smarthome-go/sdk"
 )
 
-const Version = "2.11.1"
+const Version = "2.12.0"
 
 var (
 	Verbose    bool
@@ -150,11 +150,9 @@ func Execute() {
 
 	// Subcommands
 	rootCmd.AddCommand(createCmdConfig())
-	cmdWs := createCmdWs()
-	rootCmd.AddCommand(cmdWs)
+	rootCmd.AddCommand(createCmdWs())
 	rootCmd.AddCommand(createCmdPower())
 
-	cmdWs.PersistentFlags().BoolVarP(&LintOnPush, "pushlint", "l", true, "Automatically lint the project before pushing it")
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Enables verbose output")
 	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "Smarthome-user used for the connection")
 	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "The user's password used for connection")

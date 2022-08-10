@@ -18,7 +18,7 @@ func InitConn() {
 	PromptLogin(false)
 	s.Start()
 	if (Config.Credentials.Username != "" || Config.Credentials.Password != "") && Config.Connection.UseToken {
-		fmt.Println("Warning: username and / or password not empty whilst using token authentication\n=> Ist this intended?")
+		fmt.Println("Warning: username and / or password not empty whilst using token authentication\n=> Is this intended?")
 	}
 	if !strings.HasPrefix(Config.Connection.SmarthomeUrl, "https://") && !strings.HasPrefix(Config.Connection.SmarthomeUrl, "http://") {
 		fmt.Println("Warning: no URL scheme specified: using insecure HTTP")

@@ -65,6 +65,10 @@ func initCompleter() {
 }
 
 func StartRepl() {
+	username, err := Connection.GetUsername()
+	if err != nil {
+		panic(fmt.Sprintf("Encountered impossible error: %s", err.Error()))
+	}
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 	s.Suffix = " Preparing REPL"
 	if Verbose {
@@ -75,15 +79,24 @@ func StartRepl() {
 	// Fetch the user switches
 	switches, err := Connection.GetPersonalSwitches()
 	if err != nil {
-		defer s.Stop()
-		fmt.Println(err.Error())
+		s.Stop()
+		if err == sdk.ErrInvalidCredentials {
+			fmt.Println("Could not load switches: You are missing the permission `setPower` which allows you to use switches.")
+			os.Exit(1)
+		}
+		fmt.Printf("Could not load switches: %s\n", err.Error())
+		os.Exit(1)
 	}
 	Switches = switches
 
 	initCompleter()
 	s.Stop()
 	fmt.Printf("Welcome to Homescript interactive v%s. CLI commands and comments start with \x1b[90m#\x1b[0m\n", Version)
-	fmt.Printf("Server: v%s:%s on \x1b[35m%s\x1b[0m\n", Connection.SmarthomeVersion, Connection.SmarthomeGoVersion, Url)
+	fmt.Printf("Server: v%s:%s on \x1b[35m%s\x1b[0m\n",
+		Connection.SmarthomeVersion,
+		Connection.SmarthomeGoVersion,
+		Config.Connection.SmarthomeUrl,
+	)
 	cacheDir, err := os.UserCacheDir()
 	var historyFile string
 	if err != nil {
@@ -93,7 +106,7 @@ func StartRepl() {
 		historyFile = fmt.Sprintf("%s/homescript.history", cacheDir)
 	}
 	l, err := readline.NewEx(&readline.Config{
-		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m> ", Username, Connection.SmarthomeURL.Hostname()),
+		Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m> ", username, Connection.SmarthomeURL.Hostname()),
 		HistoryFile:     historyFile,
 		AutoComplete:    completer,
 		InterruptPrompt: "^C",
@@ -155,7 +168,10 @@ func StartRepl() {
 		}
 		if strings.ReplaceAll(line, " ", "") == "#reload" {
 			if Verbose {
-				fmt.Printf("Reconnecting: (using %s@%s)\n", Connection.Username, Connection.SmarthomeURL.Hostname())
+				fmt.Printf("Reconnecting.... (using %s@%s)\n",
+					username,
+					Connection.SmarthomeURL.Hostname(),
+				)
 			}
 			// Reconnect
 			InitConn()
@@ -176,7 +192,10 @@ func StartRepl() {
 
 			// Reinitialize readline
 			l, err = readline.NewEx(&readline.Config{
-				Prompt:          fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m> ", Username, Connection.SmarthomeURL.Hostname()),
+				Prompt: fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m> ",
+					username,
+					Connection.SmarthomeURL.Hostname(),
+				),
 				HistoryFile:     historyFile,
 				AutoComplete:    completer,
 				InterruptPrompt: "^C",
@@ -193,7 +212,10 @@ func StartRepl() {
 		}
 
 		if Verbose {
-			fmt.Printf("Executing current line. (using %s@%s)\n", Connection.Username, Connection.SmarthomeURL.Hostname())
+			fmt.Printf("Executing instruction. (using %s@%s)\n",
+				username,
+				Connection.SmarthomeURL.Hostname(),
+			)
 		}
 		startTime := time.Now()
 		exitCode := workspace.RunCode(
@@ -206,6 +228,11 @@ func StartRepl() {
 		if exitCode != 0 {
 			display = fmt.Sprintf(" \x1b[31m[%d]\x1b[0m", exitCode)
 		}
-		l.SetPrompt(fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m%s[\x1b[90m%.2fs\x1b[0m]> ", Username, Connection.SmarthomeURL.Hostname(), display, time.Since(startTime).Seconds()))
+		l.SetPrompt(fmt.Sprintf("\x1b[32m%s\x1b[0m@\x1b[34m%s\x1b[0m%s[\x1b[90m%.2fs\x1b[0m]> ",
+			username,
+			Connection.SmarthomeURL.Hostname(),
+			display,
+			time.Since(startTime).Seconds()),
+		)
 	}
 }

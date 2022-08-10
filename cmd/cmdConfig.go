@@ -47,34 +47,24 @@ func createCmdConfig() *cobra.Command {
 	}
 	cmdConfig.AddCommand(cmdConfigRm)
 
-	// Update configuration
-	setUsername := ""
-	setPassword := ""
-	setURL := ""
-	setLintOnPush := false
-
+	// Update login credentials
 	cmdConfigSet := &cobra.Command{
-		Use:   "set",
-		Short: "Update configuration",
-		Long:  "Write new configuration values to the configuration file",
+		Use:   "login",
+		Short: "Save login credentials",
+		Long:  "Login to a Smarthome server and save the configutaion",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			readConfigFile()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			if setPassword == "" && setUsername == "" && setURL == "" {
-				fmt.Println("Provided at least one of the flags below in order to update the configuration.")
-				if err := cmd.Help(); err != nil {
-					panic(err.Error())
-				}
-				return
-			}
-			writeConfig(setUsername, setPassword, setURL, setLintOnPush)
+			// Prompt the user's login credentials
+			PromptLogin(true)
+			// Try to connect
+			InitConn()
+			fmt.Printf("%v", Config)
+			// On success, write the configuration to the file
+			writeConfig(Config)
 		},
 	}
-	cmdConfigSet.Flags().StringVarP(&setUsername, "new-username", "n", "", "New username to be updated")
-	cmdConfigSet.Flags().StringVarP(&setPassword, "new-password", "t", "", "New password to be updated")
-	cmdConfigSet.Flags().StringVarP(&setURL, "new-ip", "a", "", "New URL / ip to be updated")
-	cmdConfigSet.Flags().BoolVarP(&setLintOnPush, "new-lint-on-push", "l", false, "Whether to lint on every HMS workspace push action or not")
 	cmdConfig.AddCommand(cmdConfigSet)
 	return cmdConfig
 }

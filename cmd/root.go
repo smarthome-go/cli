@@ -14,23 +14,16 @@ import (
 
 const Version = "2.13.0"
 
+// Cli override configuration
 var (
-	Verbose    bool
-	Username   string
-	Password   string
-	Url        string
-	LintOnPush bool
-
+	Verbose bool
+	// Configuration from the config file
+	Config Configuration
+	// Override parameters from the CLI
+	overrideConfig Configuration
+	// Connection used for Smarthome
 	Connection *sdk.Connection
 )
-
-// Map for the config file
-var Config = map[string]string{
-	"Username":     "",
-	"Password":     "",
-	"SmarthomeURL": "",
-	"LintOnPush":   "yes",
-}
 
 var (
 	rootCmd = &cobra.Command{
@@ -154,9 +147,9 @@ func Execute() {
 	rootCmd.AddCommand(createCmdPower())
 
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Enables verbose output")
-	rootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "", "Smarthome-user used for the connection")
-	rootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "", "The user's password used for connection")
-	rootCmd.PersistentFlags().StringVarP(&Url, "ip", "i", "http://localhost", "URL of the target Smarthome instance")
+	rootCmd.PersistentFlags().StringVarP(&overrideConfig.Credentials.Username, "username", "u", "", "Smarthome-user used for the connection")
+	rootCmd.PersistentFlags().StringVarP(&overrideConfig.Credentials.Password, "password", "p", "", "The user's password used for connection")
+	rootCmd.PersistentFlags().StringVarP(&overrideConfig.Connection.SmarthomeUrl, "ip", "i", "", "URL of the target Smarthome instance")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())

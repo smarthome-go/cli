@@ -64,7 +64,11 @@ func RunById(connection *sdk.Connection, id string, args map[string]string) int 
 	ch <- struct{}{}
 	if err != nil {
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
+			username, err := connection.GetUsername()
+			if err != nil {
+				panic(fmt.Sprintf("Encountered impossible error: %s", err.Error()))
+			}
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", username)
 			return 403
 		}
 		fmt.Println(err.Error())
@@ -114,8 +118,12 @@ func RunCode(connection *sdk.Connection, code string, args map[string]string, fi
 	output, err := connection.RunHomescriptCode(code, args, time.Minute*2)
 	ch <- struct{}{}
 	if err != nil {
+		username, err := connection.GetUsername()
+		if err != nil {
+			panic(fmt.Sprintf("Encountered impossible error: %s", err.Error()))
+		}
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", username)
 			return 403
 		}
 		fmt.Println(err.Error())
@@ -140,8 +148,12 @@ func RunCode(connection *sdk.Connection, code string, args map[string]string, fi
 func LintById(connection *sdk.Connection, id string, args map[string]string) int {
 	output, err := connection.LintHomescriptById(id, args, time.Minute)
 	if err != nil {
+		username, err := connection.GetUsername()
+		if err != nil {
+			panic(fmt.Sprintf("Encountered impossible error: %s", err.Error()))
+		}
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", username)
 			return 403
 		}
 		fmt.Println(err.Error())
@@ -173,8 +185,12 @@ func LintById(connection *sdk.Connection, id string, args map[string]string) int
 func LintCode(connection *sdk.Connection, code string, args map[string]string, filename string) int {
 	output, err := connection.LintHomescriptCode(code, args, time.Minute*2)
 	if err != nil {
+		username, err := connection.GetUsername()
+		if err != nil {
+			panic(fmt.Sprintf("Encountered impossible error: %s", err.Error()))
+		}
 		if err == sdk.ErrPermissionDenied {
-			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", connection.Username)
+			fmt.Printf("Permission denied: you \x1b[90m(%s)\x1b[0m do not have the permission \x1b[90m(homescript)\x1b[0m which is required to use Homescript.\n", username)
 			return 403
 		}
 		fmt.Println(err.Error())

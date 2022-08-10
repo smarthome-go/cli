@@ -2,7 +2,7 @@ module github.com/smarthome-go/cli
 
 go 1.18
 
-require github.com/smarthome-go/sdk v0.16.0
+require github.com/smarthome-go/sdk v0.19.1
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -15,7 +15,6 @@ require (
 	github.com/sergi/go-diff v1.2.0
 	github.com/spf13/cobra v1.5.0
 	golang.org/x/text v0.3.6
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

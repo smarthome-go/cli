@@ -26,8 +26,6 @@ func createCmdWs() *cobra.Command {
 			}
 		},
 	}
-	cmdWS.PersistentFlags().BoolVarP(&LintOnPush, "pushlint", "l", true, "Automatically lint the project before pushing it")
-
 	cmdWSInit := &cobra.Command{
 		Use:   "new [hms-id] [project-name]",
 		Short: "Create a new project",
@@ -56,9 +54,10 @@ func createCmdWs() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			InitConn()
-			workspace.PushLocal(Connection, LintOnPush)
+			workspace.PushLocal(Connection, Config.Homescript.LintOnPush)
 		},
 	}
+	cmdWSPush.PersistentFlags().BoolVarP(&overrideConfig.Homescript.LintOnPush, "pushlint", "l", true, "Automatically lint the project before pushing it")
 	cmdWSL := &cobra.Command{
 		Use:   "ls",
 		Short: "List remote projects",
@@ -120,7 +119,7 @@ func createCmdWs() *cobra.Command {
 			var exitCode int
 			if runOnlyLocal {
 				if Verbose {
-					fmt.Printf("Executing `%s.hms` on `%s@%s` using local state...", config.Id, Connection.Username, Connection.SmarthomeURL.String())
+					fmt.Printf("Executing `%s.hms` on `%s@%s` using local state...", config.Id, Config.Credentials.Username, Connection.SmarthomeURL.String())
 				}
 				exitCode = workspace.RunCode(Connection,
 					string(content),
@@ -129,7 +128,7 @@ func createCmdWs() *cobra.Command {
 				)
 			} else {
 				if Verbose {
-					fmt.Printf("Executing `%s.hms` on `%s@%s` using remote state...", config.Id, Connection.Username, Connection.SmarthomeURL.String())
+					fmt.Printf("Executing `%s.hms` on `%s@%s` using remote state...", config.Id, Config.Credentials.Username, Connection.SmarthomeURL.String())
 				}
 				exitCode = workspace.RunById(
 					Connection,

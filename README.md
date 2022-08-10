@@ -7,14 +7,14 @@
 Smarthome-cli's (formerly Homescript-cli) original purpose is to represent a powerful command-line-interface for the Smarthome server.
 A sample output of a *REPL* session can be found below
 ```
-Welcome to Homescript interactive v2.14.1. CLI commands and comments start with #
+Welcome to Homescript interactive v2.14.2. CLI commands and comments start with #
 Server: v0.0.47:go1.18.3 on http://smarthome.box
 admin@homescript>
 ```
 
 ## Help Output
 ```
-homescript-cli v2.14.1 : A command line interface for the smarthome server using homescript
+homescript-cli v2.14.2 : A command line interface for the smarthome server using homescript
 A working and set-up Smarthome server instance is required.
 For more information and usage documentation visit:
 
@@ -54,10 +54,10 @@ Flags:
 Use "homescript [command] --help" for more information about a command.
 ```
 
-## Installation of v2.14.1 (for Linux/AMD64)
+## Installation of v2.14.2 (for Linux/AMD64)
 
 ```
-cd /tmp && wget https://github.com/smarthome-go/cli/releases/download/v2.14.1/homescript_linux_amd64.tar.gz && tar -xvf homescript_linux_amd64.tar.gz && sudo mv homescript /usr/bin && rm -rf homescript_linux_amd64.tar.gz
+cd /tmp && wget https://github.com/smarthome-go/cli/releases/download/v2.14.2/homescript_linux_amd64.tar.gz && tar -xvf homescript_linux_amd64.tar.gz && sudo mv homescript /usr/bin && rm -rf homescript_linux_amd64.tar.gz
 ```
 
 ## Installation on Arch Linux

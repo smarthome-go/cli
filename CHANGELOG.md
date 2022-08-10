@@ -1,3 +1,5 @@
 ## Changelog
 
-- Removed debug print which was included in the release by accident
+- Fixed all known bugs
+- Removed false warnings about token + username
+- Removed unwanted password prompt after authentication has already been saved

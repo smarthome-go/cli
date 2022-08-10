@@ -59,6 +59,11 @@ func createCmdConfig() *cobra.Command {
 			// Try to connect
 			InitConn()
 			// On success, write the configuration to the file
+			if Config.Connection.UseToken {
+				// If token authentication is used, do not write a username or a password to the new file
+				Config.Credentials.Username = ""
+				Config.Credentials.Password = ""
+			}
 			writeConfig(Config)
 		},
 	}

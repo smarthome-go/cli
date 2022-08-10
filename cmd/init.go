@@ -105,7 +105,7 @@ func InitConn() {
 
 // The login function prompts the user to enter their credentials, only used if credentials are not specified beforehand (using config or flags)
 func PromptLogin(force bool) {
-	if Config.Credentials.Username == "" || force || Config.Connection.UseToken {
+	if force || (Config.Connection.UseToken && Config.Credentials.Token == "") || (!Config.Connection.UseToken && Config.Credentials.Username == "") {
 		fmt.Printf("\x1b[1;33mAuthentication required\x1b[1;0m: Please enter credentials for `%s`\n", Config.Connection.SmarthomeUrl)
 		if Config.Connection.UseToken {
 			if Config.Credentials.Token == "" {
@@ -145,7 +145,7 @@ func PromptLogin(force bool) {
 			fmt.Printf("Omitting password-prompt: found possible password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m\n")
 		}
 	}
-	if Config.Credentials.Password == "" || force {
+	if force || !Config.Connection.UseToken && Config.Credentials.Password == "" {
 		fmt.Printf("Please enter password for user '%s' in order to continue.\n", Config.Credentials.Username)
 		fmt.Printf("Password: ")
 		pass, err := gopass.GetPasswd()
@@ -156,7 +156,7 @@ func PromptLogin(force bool) {
 		Config.Credentials.Password = string(pass)
 	} else {
 		if Verbose {
-			fmt.Println("Password already set from env, args, or config file")
+			fmt.Println("Password already set from env, args, or config file (or omitted)")
 		}
 	}
 }

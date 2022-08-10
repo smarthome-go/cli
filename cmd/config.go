@@ -39,7 +39,7 @@ type Credentials struct {
 
 type HomescriptConfig struct {
 	// Whether to lint Homescript projects before push
-	LintOnPush bool
+	LintOnPush bool `toml:"lint_on_push"`
 }
 
 func readConfigFile() {

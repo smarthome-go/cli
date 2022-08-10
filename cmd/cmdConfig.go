@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +58,6 @@ func createCmdConfig() *cobra.Command {
 			PromptLogin(true)
 			// Try to connect
 			InitConn()
-			fmt.Printf("%v", Config)
 			// On success, write the configuration to the file
 			writeConfig(Config)
 		},

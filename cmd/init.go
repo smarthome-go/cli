@@ -134,17 +134,6 @@ func PromptLogin(force bool) {
 			fmt.Println("Username already set via flags or configuration file, not prompting")
 		}
 	}
-	/*
-		`SMARTHOME_ADMIN_PASSWORD`: Checks for the smarthome admin user
-	*/
-	// Uses the admin-password environment variable if the user is `admin` and has a omitted password
-	// Only used inside the Smarthome Docker-container on initial setup because the environment variable is only used on the first start of the container
-	if adminPassword, adminPasswordOk := os.LookupEnv("SMARTHOME_ADMIN_PASSWORD"); adminPasswordOk && Config.Credentials.Username == "admin" && Config.Credentials.Password == "" {
-		Config.Credentials.Password = adminPassword
-		if Verbose {
-			fmt.Printf("Omitting password-prompt: found possible password from \x1b[1;33mSMARTHOME_ADMIN_PASSWORD\x1b[1;0m\n")
-		}
-	}
 	if force || !Config.Connection.UseToken && Config.Credentials.Password == "" {
 		fmt.Printf("Please enter password for user '%s' in order to continue.\n", Config.Credentials.Username)
 		fmt.Printf("Password: ")

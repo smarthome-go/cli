@@ -1,5 +1,4 @@
 ## Changelog
 
-- Fixed all known bugs
-- Removed false warnings about token + username
-- Removed unwanted password prompt after authentication has already been saved
+- Removed deprecated env check for the admin user's password
+- This was used in older, now deprecated versions of the server

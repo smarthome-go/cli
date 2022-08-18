@@ -12,7 +12,7 @@ import (
 	"github.com/smarthome-go/sdk"
 )
 
-const Version = "2.14.2"
+const Version = "2.14.3"
 
 // Cli override configuration
 var (

@@ -21,6 +21,7 @@ type ConfigToml struct {
 	QuickActionsEnabled bool   `toml:"quickActions"`
 	SchedulerEnabled    bool   `toml:"scheduler"`
 	MDIcon              string `toml:"icon"`
+	Workspace           string `toml:"workspace"`
 }
 
 // Creates a new project on the remote and locally
@@ -90,9 +91,10 @@ func createProjectConfigFile(id string, name string, path string) error {
 		name = id
 	}
 	if err := toml.NewEncoder(file).Encode(ConfigToml{
-		Id:     id,
-		Name:   name,
-		MDIcon: "code",
+		Id:        id,
+		Name:      name,
+		MDIcon:    "code",
+		Workspace: "default",
 	}); err != nil {
 		return err
 	}
@@ -189,6 +191,7 @@ func PushLocal(c *sdk.Connection, lintOnPush bool) {
 		SchedulerEnabled:    configToml.SchedulerEnabled,
 		Code:                string(hmsContent),
 		MDIcon:              configToml.MDIcon,
+		Workspace:           configToml.Workspace,
 	}); err != nil {
 		switch err {
 		case sdk.ErrUnprocessableEntity:
@@ -220,6 +223,7 @@ func PushLocal(c *sdk.Connection, lintOnPush bool) {
 		QuickActionsEnabled: remoteBef.Data.QuickActionsEnabled,
 		SchedulerEnabled:    remoteBef.Data.SchedulerEnabled,
 		MDIcon:              remoteBef.Data.MDIcon,
+		Workspace:           remoteBef.Data.Workspace,
 	}
 	// Display general Diff info
 	if tomlBef != configToml {
@@ -274,6 +278,7 @@ func PullLocal(c *sdk.Connection) {
 		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
 		SchedulerEnabled:    remote.Data.SchedulerEnabled,
 		MDIcon:              remote.Data.MDIcon,
+		Workspace:           remote.Data.Workspace,
 	})
 	if err != nil {
 		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
@@ -306,7 +311,8 @@ func PullLocal(c *sdk.Connection) {
 		Description:         remote.Data.Description,
 		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
 		SchedulerEnabled:    remote.Data.SchedulerEnabled,
-		MDIcon:              configToml.MDIcon,
+		MDIcon:              remote.Data.MDIcon,
+		Workspace:           remote.Data.Workspace,
 	}
 	// Display general Diff info
 	if tomlBef != configToml {
@@ -401,6 +407,7 @@ func Clone(c *sdk.Connection, id string) {
 		QuickActionsEnabled: remote.Data.QuickActionsEnabled,
 		SchedulerEnabled:    remote.Data.SchedulerEnabled,
 		MDIcon:              remote.Data.MDIcon,
+		Workspace:           remote.Data.Workspace,
 	})
 	if err != nil {
 		fmt.Printf("Could not pull remote state: failed to parse server response: %s\n", err.Error())
